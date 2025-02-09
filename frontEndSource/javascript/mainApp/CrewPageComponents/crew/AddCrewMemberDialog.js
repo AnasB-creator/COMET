@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   VStack,
   Box,
@@ -44,11 +44,11 @@ const CREW_ROLES = createListCollection({
   ]
 });
 
-const CREW_STATUSES = createListCollection({
+const CREW_STATUS = createListCollection({
   items: [
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' },
-    { value: 'critical', label: 'Critical' }
+    { label: 'Active', value: 'active' },
+    { label: 'Inactive', value: 'inactive' },
+    { label: 'Critical', value: 'critical' }
   ]
 });
 
@@ -58,14 +58,16 @@ function AddCrewMemberDialog({
   onSubmit,
   fleetName = "Fleet F001",
   captainName = "Captain O'Neil",
+  opacity = 0.7,
+  blurStrength = 8
 }) {
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     role: '',
-    status: ['active'],
-    dateOfBirth: '',
+    status: '',
     sex: '',
+    dateOfBirth: '',
   });
 
   const [errors, setErrors] = React.useState({});
@@ -84,6 +86,23 @@ function AddCrewMemberDialog({
     }
   };
 
+  const handleSelectChange = (name, value) => {
+    // Extract just the value from the select state
+    const actualValue = value?.value?.[0] || value;
+    
+    setFormData(prev => ({
+      ...prev,
+      [name]: actualValue
+    }));
+
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
   const handleStatusChange = (details) => {
     setFormData(prev => ({
       ...prev,
@@ -91,17 +110,45 @@ function AddCrewMemberDialog({
     }));
   };
 
-  const validateForm = () => {
+  const validateForm = (data) => {
     const newErrors = {};
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-    if (!formData.role.trim()) newErrors.role = 'Role is required';
+    
+    // Validate firstName
+    if (!data.firstName?.trim()) {
+      newErrors.firstName = 'First name is required';
+    }
+    
+    // Validate lastName
+    if (!data.lastName?.trim()) {
+      newErrors.lastName = 'Last name is required';
+    }
+    
+    // Validate role - check if exists instead of trim
+    if (!data.role) {
+      newErrors.role = 'Role is required';
+    }
+    
+    // Validate sex
+    if (!data.sex) {
+      newErrors.sex = 'Sex is required';
+    }
+    
+    // Validate dateOfBirth
+    if (!data.dateOfBirth) {
+      newErrors.dateOfBirth = 'Date of birth is required';
+    }
+    
+    // Validate status
+    if (!data.status) {
+      newErrors.status = 'Status is required';
+    }
+
     return newErrors;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newErrors = validateForm();
+    const newErrors = validateForm(formData);
     
     if (Object.keys(newErrors).length === 0) {
       onSubmit(formData);
@@ -145,6 +192,14 @@ function AddCrewMemberDialog({
     }
   };
 
+  const inputStyles = {
+    bg: "whiteAlpha.50",
+    border: "1px solid",
+    borderColor: "whiteAlpha.200",
+    _hover: { borderColor: "whiteAlpha.300" },
+    _focus: { borderColor: "blue.300", boxShadow: "none" },
+  };
+
   return (
     <DialogRoot open={isOpen} onOpenChange={onClose}>
       <DialogContent
@@ -157,6 +212,10 @@ function AddCrewMemberDialog({
         zIndex="modal"
         p={0}
         boxShadow="0 4px 20px rgba(123, 67, 251, 0.1)"
+        style={{
+          background: `rgba(26, 32, 44, ${opacity})`,
+          backdropFilter: `blur(${blurStrength}px)`,
+        }}
       >
         <DialogHeader
           borderBottom="1px solid"
@@ -257,7 +316,7 @@ function AddCrewMemberDialog({
                   >
                     <SelectRoot 
                       value={formData.role}
-                      onValueChange={handleChange}
+                      onValueChange={(value) => handleSelectChange('role', value)}
                       collection={CREW_ROLES}
                     >
                       <SelectTrigger {...selectStyles.trigger}>
@@ -277,20 +336,33 @@ function AddCrewMemberDialog({
                     </SelectRoot>
                   </Field>
 
-                  <Field label="Status">
+                  <Field label="Date of Birth *" invalid={!!errors.dateOfBirth}>
+                    <Input
+                      type="date"
+                      name="dateOfBirth"
+                      value={formData.dateOfBirth}
+                      onChange={handleChange}
+                      {...inputStyles}
+                    />
+                    {errors.dateOfBirth && (
+                      <Text color="red.500" fontSize="sm">
+                        {errors.dateOfBirth}
+                      </Text>
+                    )}
+                  </Field>
+
+                  <Field label="Status *" invalid={!!errors.status}>
                     <SelectRoot 
-                      value={formData.status}
-                      defaultValue={['active']}
-                      onValueChange={handleStatusChange}
-                      collection={CREW_STATUSES}
+                      collection={CREW_STATUS}
+                      onValueChange={(value) => handleSelectChange('status', value)}
                     >
                       <SelectTrigger {...selectStyles.trigger}>
                         <SelectValueText />
                       </SelectTrigger>
                       <SelectContent {...selectStyles.content}>
-                        {CREW_STATUSES.items.map((item) => (
+                        {CREW_STATUS.items.map((item) => (
                           <SelectItem 
-                            key={item.value} 
+                            key={item.value}
                             item={item}
                             sx={selectStyles.item}
                           >
@@ -299,6 +371,11 @@ function AddCrewMemberDialog({
                         ))}
                       </SelectContent>
                     </SelectRoot>
+                    {errors.status && (
+                      <Text color="red.500" fontSize="sm">
+                        {errors.status}
+                      </Text>
+                    )}
                   </Field>
                 </VStack>
               </Fieldset.Content>

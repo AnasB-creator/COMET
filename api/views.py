@@ -10,6 +10,7 @@ from typing import List, Dict
 from .models import CrewMember, HealthMetrics, HealthProblem, IndividualHealthReport
 from django.db.models import Prefetch
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 User = get_user_model()
 # Create your views here.
@@ -100,3 +101,98 @@ def get_crew_members_data(request):
         response_data.append(crew_member_data)
 
     return Response(response_data)
+
+@api_view(['POST'])
+def create_crew_member(request):
+    try:
+        # Using default user (O'Neil) as specified
+        default_user = User.objects.get(username='Oneil')
+        
+        # Extract fleet ID from the format 'F001' to just '1'
+        fleet_id = request.data.get('fleet', 'F001')
+        if fleet_id.startswith('F'):
+            fleet_id = int(fleet_id[1:])  # Remove 'F' and convert to integer
+        
+        # Parse the date string to a proper date object
+        date_of_birth = timezone.datetime.strptime(
+            request.data['dateOfBirth'], 
+            '%Y-%m-%d'
+        ).date()
+        
+        # Create crew member with request data
+        crew_member = CrewMember.objects.create(
+            user=default_user,
+            first_name=request.data['firstName'],
+            last_name=request.data['lastName'],
+            sex=request.data['sex'],
+            date_of_birth=date_of_birth,  # Use the parsed date
+            role=request.data['role'],
+            status=request.data['status'],
+            fleet_id=fleet_id
+        )
+
+        # Create default health metrics with proper JSON structure
+        default_metrics = HealthMetrics.objects.create(
+            crew_member=crew_member,
+            date=timezone.now(),
+            heart_rate={'value': 72, 'unit': 'bpm', 'status': 'normal'},
+            sleep_duration={'value': 7.5, 'unit': 'hours', 'status': 'normal'},
+            respiration_rate={'value': 16, 'unit': 'rpm', 'status': 'normal'},
+            blood_oxygen={'value': 98, 'unit': '%', 'status': 'normal'},
+            bone_density={'value': 95, 'unit': '%', 'status': 'normal'},
+            radiation={'value': 0.12, 'unit': 'mSv', 'status': 'normal'},
+            exercise_level={'value': 85, 'unit': '%', 'status': 'normal'},
+            outside_time={'value': 2.5, 'unit': 'hrs', 'status': 'normal'},
+            weight={'value': 68, 'unit': 'kg', 'status': 'normal'},
+            height={'value': 170, 'unit': 'cm', 'status': 'normal'}
+        )
+
+        # Format response following the same structure as get_crew_members_data
+        response_data = {
+            'id': f'CM{crew_member.id:03d}',
+            'firstName': crew_member.first_name,
+            'lastName': crew_member.last_name,
+            'role': crew_member.role,
+            'status': crew_member.status,
+            'sex': crew_member.sex,
+            'dateOfBirth': crew_member.date_of_birth.isoformat(),
+            'avatar': None,
+            'fleet': {
+                'id': f'F{crew_member.fleet.id:03d}',
+                'name': crew_member.fleet.name,
+                'companyName': crew_member.fleet.company_name,
+                'captain': {
+                    'id': f'U{crew_member.fleet.user.id:03d}',
+                    'name': crew_member.fleet.user.username,
+                }
+            },
+            'userId': f'U{crew_member.user.id:03d}',
+            'healthMetrics': {
+                'date': default_metrics.date.isoformat(),
+                'heartRate': default_metrics.heart_rate,
+                'sleepDuration': default_metrics.sleep_duration,
+                'respirationRate': default_metrics.respiration_rate,
+                'bloodOxygen': default_metrics.blood_oxygen,
+                'boneDensity': default_metrics.bone_density,
+                'radiation': default_metrics.radiation,
+                'exerciseLevel': default_metrics.exercise_level,
+                'outsideTime': default_metrics.outside_time,
+                'weight': default_metrics.weight,
+                'height': default_metrics.height
+            },
+            'problems': [],
+            'reports': []
+        }
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
+    except KeyError as e:
+        return Response(
+            {'error': f'Missing required field: {str(e)}'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

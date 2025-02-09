@@ -41,3 +41,11 @@ export const getCrewMembersData = async () => {
   return response;
 };
 
+export const createCrewMember = async (crewMemberData) => {
+  const response = await apiRequest('/api/crew-members-create/', {
+    method: 'POST',
+    body: crewMemberData,  // Pass the data object directly
+  });
+  return response;
+};
+
