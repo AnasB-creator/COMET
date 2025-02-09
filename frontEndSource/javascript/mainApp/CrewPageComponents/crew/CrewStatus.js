@@ -4,7 +4,8 @@ import {
   Box, 
   Text,
   Circle,
-  Spinner
+  Spinner,
+  HStack,
 } from '@chakra-ui/react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, useGLTF } from '@react-three/drei';
@@ -39,15 +40,48 @@ const CrewStatus = ({
       align="center"
       position="relative"
       h="100%"
-      justify="center"
+      justify="space-between"
       border="1px solid"
       borderColor="whiteAlpha.200"
       transition="all 0.3s ease"
     >
+      {/* Top Section with Fleet Info */}
+      <VStack 
+        spacing={2} 
+        w="100%"
+        divideY
+        divideColor="whiteAlpha.200"
+      >
+        <HStack justify="space-between" w="100%">
+          <Text 
+            fontSize="sm" 
+            color="whiteAlpha.900"
+            fontWeight="bold"
+          >
+            Fleet: {crewMember.fleet.name}
+          </Text>
+          <Text 
+            fontSize="sm" 
+            color="whiteAlpha.700"
+          >
+            ID: {crewMember.fleet.id}
+          </Text>
+        </HStack>
+        <Text 
+          fontSize="sm" 
+          color="whiteAlpha.700"
+          alignSelf="flex-start"
+          pb={2}
+        >
+          Captain: {crewMember.fleet.captain.name}
+        </Text>
+      </VStack>
+
+      {/* Middle Section with 3D Model */}
       <Box
         position="relative"
         overflow="hidden"
-        boxSize={{ base: "200px", lg: "300px" }}
+        boxSize={{ base: "200px", lg: "250px" }}
         bg="transparent"
       >
         <Canvas
@@ -77,6 +111,7 @@ const CrewStatus = ({
         />
       </Box>
 
+      {/* Bottom Section with Crew Info */}
       <VStack 
         spacing={2} 
         textAlign="center"
