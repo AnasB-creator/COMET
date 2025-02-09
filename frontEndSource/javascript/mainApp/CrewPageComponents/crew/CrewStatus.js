@@ -1,16 +1,24 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { 
   VStack, 
   Box, 
-  Image, 
   Text,
-  Circle
+  Circle,
+  Spinner
 } from '@chakra-ui/react';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, useGLTF } from '@react-three/drei';
+
+// Create a separate component for the 3D model
+function AstronautModel() {
+  const { scene } = useGLTF('/static/images/cute_astronaut_gltf/scene.gltf');
+  return <primitive object={scene} scale={2.5} position={[0, -0.25, 0]} />;
+}
 
 const CrewStatus = ({ 
   crewMember, 
   opacity = 0.7,
-  blurStrength = 8  // Default blur strength in pixels
+  blurStrength = 8
 }) => {
   const statusColors = {
     active: 'green.400',
@@ -34,39 +42,37 @@ const CrewStatus = ({
       justify="center"
       border="1px solid"
       borderColor="whiteAlpha.200"
-      transition="all 0.3s ease"  // Smooth transition for both opacity and blur
+      transition="all 0.3s ease"
     >
       <Box
         position="relative"
-        borderRadius="full"
         overflow="hidden"
-        boxSize={{ base: "150px", lg: "200px" }}
-        border="4px solid"
-        borderColor={statusColors[crewMember.status]}
-        bg="gray.800"
+        boxSize={{ base: "200px", lg: "300px" }}
+        bg="transparent"
       >
-        <Image
-          src={crewMember.avatar || '/static/images/default-avatar.png'}
-          alt={crewMember.name}
-          fallback={
-            <Box
-              bg="gray.800"
-              w="100%"
-              h="100%"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <Text fontSize="4xl">{crewMember.name[0]}</Text>
-            </Box>
-          }
-        />
+        <Canvas
+          camera={{ position: [0, 0, 6], fov: 45 }}
+          style={{ width: '100%', height: '100%' }}
+        >
+          <ambientLight intensity={0.5} />
+          <pointLight position={[10, 10, 10]} />
+          <Suspense fallback={null}>
+            <AstronautModel />
+          </Suspense>
+          <OrbitControls 
+            enableZoom={false}
+            enablePan={false}
+            autoRotate
+            autoRotateSpeed={4}
+          />
+        </Canvas>
+        
         <Circle
           size="16px"
           bg={statusColors[crewMember.status]}
           position="absolute"
-          bottom={2}
-          right={2}
+          top={4}
+          right={4}
           boxShadow={`0 0 10px ${statusColors[crewMember.status]}`}
         />
       </Box>
@@ -95,5 +101,8 @@ const CrewStatus = ({
     </VStack>
   );
 };
+
+// Preload the 3D model
+useGLTF.preload('/static/images/cute_astronaut_gltf/scene.gltf');
 
 export default CrewStatus; 
