@@ -256,6 +256,15 @@ def create_health_report(request):
             '%Y-%m-%d'
         )
 
+        # Get risk_level from request data, using the correct field name
+        risk_level = request.data.get('risk_level')  # Changed from riskLevel
+        
+        if not risk_level:
+            return Response(
+                {'error': 'risk_level is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         # Create health report
         health_report = IndividualHealthReport.objects.create(
             crew_member_id=crew_member_id,
@@ -263,7 +272,7 @@ def create_health_report(request):
             title=request.data.get('title'),
             subtitle=request.data.get('subtitle'),
             content=request.data.get('content'),
-            risk_level=request.data.get('riskLevel')
+            risk_level=risk_level  # Changed from riskLevel
         )
 
         # Format response data
@@ -273,7 +282,7 @@ def create_health_report(request):
             'title': health_report.title,
             'subtitle': health_report.subtitle,
             'content': health_report.content,
-            'riskLevel': health_report.risk_level
+            'riskLevel': health_report.risk_level  # Keep as riskLevel in response for frontend
         }
 
         return Response(response_data, status=status.HTTP_201_CREATED)

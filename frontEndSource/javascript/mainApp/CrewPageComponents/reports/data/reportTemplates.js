@@ -15,11 +15,11 @@ export const reportTemplates = {
           },
           {
             "title": "Recommendations",
-            "content": "Increase resistance training frequency to 4 sessions per week. Continue calcium supplementation."
+            "content": "Continue resistance training protocol. Increase calcium and vitamin D supplementation."
           }
         ]
       },
-      "riskLevel": "low"
+      "risk_level": "low"
     },
     {
       "title": "Radiation Exposure Analysis",
@@ -40,7 +40,7 @@ export const reportTemplates = {
           }
         ]
       },
-      "riskLevel": "medium"
+      "risk_level": "medium"
     },
     {
       "title": "Emergency Medical Incident Report",
@@ -61,10 +61,11 @@ export const reportTemplates = {
           }
         ]
       },
-      "riskLevel": "high"
+      "risk_level": "high"
     },
     {
       "title": "Psychological Health Evaluation",
+
       "subtitle": "Quarterly Mental Health Assessment",
       "content": {
         "sections": [
@@ -82,7 +83,7 @@ export const reportTemplates = {
           }
         ]
       },
-      "riskLevel": "low"
+      "risk_level": "low"
     },
     {
       "title": "Cardiovascular Fitness Report",
@@ -103,7 +104,7 @@ export const reportTemplates = {
           }
         ]
       },
-      "riskLevel": "medium"
+      "risk_level": "medium"
     },
     {
       "title": "Critical Systems Exposure Report",
@@ -124,7 +125,7 @@ export const reportTemplates = {
           }
         ]
       },
-      "riskLevel": "high"
+      "risk_level": "high"
     },
     {
       "title": "Vision Health Assessment",
@@ -145,7 +146,7 @@ export const reportTemplates = {
           }
         ]
       },
-      "riskLevel": "medium"
+      "risk_level": "medium"
     },
     {
       "title": "Immune System Function Report",
@@ -166,7 +167,7 @@ export const reportTemplates = {
           }
         ]
       },
-      "riskLevel": "low"
+      "risk_level": "low"
     },
     {
       "title": "Emergency EVA Incident Report",
@@ -187,7 +188,7 @@ export const reportTemplates = {
           }
         ]
       },
-      "riskLevel": "high"
+      "risk_level": "high"
     },
     {
       "title": "Sleep Quality Analysis",
@@ -208,7 +209,7 @@ export const reportTemplates = {
           }
         ]
       },
-      "riskLevel": "medium"
+      "risk_level": "medium"
     },
     {
       "title": "Nutritional Status Report",
@@ -229,7 +230,7 @@ export const reportTemplates = {
           }
         ]
       },
-      "riskLevel": "low"
+      "risk_level": "low"
     },
     {
       "title": "Cognitive Performance Evaluation",
@@ -250,7 +251,7 @@ export const reportTemplates = {
           }
         ]
       },
-      "riskLevel": "low"
+      "risk_level": "low"
     },
     {
       "title": "Radiation Storm Exposure Event",
@@ -271,7 +272,7 @@ export const reportTemplates = {
           }
         ]
       },
-      "riskLevel": "high"
+      "risk_level": "high"
     },
     {
       "title": "Musculoskeletal Strain Assessment",
@@ -292,7 +293,7 @@ export const reportTemplates = {
           }
         ]
       },
-      "riskLevel": "medium"
+      "risk_level": "medium"
     },
     {
       "title": "Environmental Systems Exposure",
@@ -313,7 +314,7 @@ export const reportTemplates = {
           }
         ]
       },
-      "riskLevel": "medium"
+      "risk_level": "medium"
     },
     {
       "title": "Vestibular Adaptation Report",
@@ -334,7 +335,7 @@ export const reportTemplates = {
           }
         ]
       },
-      "riskLevel": "low"
+      "risk_level": "low"
     }
   ]
 };

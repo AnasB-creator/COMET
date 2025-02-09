@@ -26,9 +26,10 @@ export function GenerateReportButton({ crewMemberId, className }) {
           content: section.content
         }))
       },
-      risk_level: randomTemplate.riskLevel // Changed to match snake_case convention
+      risk_level: randomTemplate.risk_level // Changed from riskLevel to risk_level
     };
 
+    console.log('Sending report data:', reportData); // Add this for debugging
     createReport(reportData);
   };
 
