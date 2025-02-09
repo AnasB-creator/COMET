@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from django.db.models import Q
 from typing import List, Dict
 # from django.contrib.auth.models import User
-from .models import CrewMember, HealthMetrics, HealthProblem, IndividualHealthReport
+from .models import CrewMember, HealthMetrics, HealthProblem, IndividualHealthReport, Fleet
 from django.db.models import Prefetch
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -17,14 +17,97 @@ User = get_user_model()
 
 
 @api_view(['GET'])
+def get_fleets(request):
+    # Using default user (O'Neil) as specified
+    default_user = User.objects.get(username='Oneil')
+    
+    # Use prefetch_related to efficiently load crew_members
+    fleets = Fleet.objects.filter(
+        user=default_user
+    ).prefetch_related('crew_members')
+    
+    response_data = []
+    for fleet in fleets:
+        fleet_data = {
+            'id': f'F{fleet.id:03d}',
+            'name': fleet.name,
+            'companyName': fleet.company_name,
+            'captain': {
+                'id': f'U{fleet.user.id:03d}',
+                'name': fleet.user.username,
+            },
+            'crewCount': fleet.crew_members.count(),  # Using the related_name from model
+            'crewMembers': [  # Add crew member IDs for reference
+                f'CM{crew.id:03d}' for crew in fleet.crew_members.all()
+            ]
+        }
+        response_data.append(fleet_data)
+
+    return Response(response_data)
+
+@api_view(['POST'])
+def create_fleet(request):
+    try:
+        # Using default user (O'Neil) as specified
+        default_user = User.objects.get(username='Oneil')
+        
+        # Create fleet using model fields
+        fleet = Fleet.objects.create(
+            user=default_user,
+            name=request.data['name'],
+            company_name=request.data['companyName']  # matches the model field name
+        )
+
+        # Format response data
+        response_data = {
+            'id': f'F{fleet.id:03d}',
+            'name': fleet.name,
+            'companyName': fleet.company_name,
+            'captain': {
+                'id': f'U{fleet.user.id:03d}',
+                'name': fleet.user.username,
+            },
+            'crewCount': 0,
+            'crewMembers': []
+        }
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
+    except KeyError as e:
+        return Response(
+            {'error': f'Missing required field: {str(e)}'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['GET'])
 def get_crew_members_data(request):
     # Using a default user (O'Neil) instead of authentication
     default_user = User.objects.get(username='Oneil')
     
-    crew_members = CrewMember.objects.filter(
-        user=default_user
-    ).prefetch_related(
-        'fleet__user',  # Add this to prefetch fleet's user (captain) data
+    # Get fleet filter from query params
+    fleet_id = request.GET.get('fleet')
+    print(f"Received fleet_id: {fleet_id}")  # Debug log
+    
+    if fleet_id and fleet_id.startswith('F'):
+        fleet_id = int(fleet_id[1:])  # Convert 'F001' to 1
+        print(f"Converted fleet_id: {fleet_id}")  # Debug log
+    
+    # Base queryset
+    queryset = CrewMember.objects.filter(user=default_user)
+    print(f"Base queryset count: {queryset.count()}")  # Debug log
+    
+    # Apply fleet filter if provided
+    if fleet_id:
+        queryset = queryset.filter(fleet_id=fleet_id)
+        print(f"Filtered queryset count: {queryset.count()}")  # Debug log
+    
+    crew_members = queryset.prefetch_related(
+        'fleet__user',
         Prefetch('health_metrics', queryset=HealthMetrics.objects.order_by('-date')),
         Prefetch('health_problems', queryset=HealthProblem.objects.order_by('-date')),
         Prefetch('health_reports', queryset=IndividualHealthReport.objects.order_by('-date'))
