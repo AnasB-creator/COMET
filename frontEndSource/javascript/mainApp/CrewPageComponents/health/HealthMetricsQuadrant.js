@@ -34,8 +34,8 @@ const HealthMetricsQuadrant = ({ crewMember }) => {
       overflow="hidden"
     >
       <Heading size="lg" color="gray.100" mb={4}>
-        Health Metrics - {new Date(healthMetrics.date).toLocaleDateString()}
-      </Heading>
+  Health Metrics - {new Date(healthMetrics.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
+</Heading>
       <Box
         overflowY="auto"
         height="calc(100% - 60px)"
