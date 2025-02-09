@@ -18,11 +18,12 @@ User = get_user_model()
 @api_view(['GET'])
 def get_crew_members_data(request):
     # Using a default user (O'Neil) instead of authentication
-    default_user = User.objects.get(username='Oneil')  # Make sure this user exists
+    default_user = User.objects.get(username='Oneil')
     
     crew_members = CrewMember.objects.filter(
         user=default_user
     ).prefetch_related(
+        'fleet__user',  # Add this to prefetch fleet's user (captain) data
         Prefetch('health_metrics', queryset=HealthMetrics.objects.order_by('-date')),
         Prefetch('health_problems', queryset=HealthProblem.objects.order_by('-date')),
         Prefetch('health_reports', queryset=IndividualHealthReport.objects.order_by('-date'))
@@ -68,6 +69,17 @@ def get_crew_members_data(request):
             'riskLevel': report.risk_level
         } for report in crew_member.health_reports.all()]
 
+        # Add fleet and captain information
+        fleet_data = {
+            'id': f'F{crew_member.fleet.id:03d}',
+            'name': crew_member.fleet.name,
+            'companyName': crew_member.fleet.company_name,
+            'captain': {
+                'id': f'U{crew_member.fleet.user.id:03d}',
+                'name': crew_member.fleet.user.username,
+            }
+        }
+
         # Construct crew member data
         crew_member_data = {
             'id': f'CM{crew_member.id:03d}',
@@ -78,7 +90,7 @@ def get_crew_members_data(request):
             'sex': crew_member.sex,
             'dateOfBirth': crew_member.date_of_birth.isoformat(),
             'avatar': None,
-            'fleetId': f'F{crew_member.fleet.id:03d}',
+            'fleet': fleet_data,  # Changed from just fleetId to full fleet object
             'userId': f'U{crew_member.user.id:03d}',
             'healthMetrics': metrics_data,
             'problems': problems,
