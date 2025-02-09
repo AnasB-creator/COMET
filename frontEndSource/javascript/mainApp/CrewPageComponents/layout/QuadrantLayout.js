@@ -1,13 +1,10 @@
 import React from 'react';
-import { Grid, Box } from '@chakra-ui/react';
+import { Box, Grid } from '@chakra-ui/react';
+import FleetDrawer from '../../FleetComponents/FleetDrawer';
 
 const QuadrantLayout = ({ children }) => {
   return (
-    <Box
-      position="relative"
-      h="100vh"
-      overflow="hidden"
-    >
+    <Box position="relative" h="100vh" overflow="hidden">
       {/* Background Image Layer */}
       <Box
         position="absolute"
@@ -18,8 +15,7 @@ const QuadrantLayout = ({ children }) => {
         bgImage="url('/static/images/space_background3.png')"
         bgSize="cover"
         bgPosition="center"
-        bgRepeat="no-repeat"
-        opacity="0.95"
+        zIndex={1}
       />
       
       {/* Content Grid Layer */}
@@ -29,12 +25,17 @@ const QuadrantLayout = ({ children }) => {
         gap={6}
         p={6}
         position="relative"
-        zIndex={1}
+        zIndex={2}
         h="100%"
         color="white"
       >
         {children}
       </Grid>
+
+      {/* Fleet Drawer */}
+      <FleetDrawer>
+        <Box color="white">Fleet content will go here</Box>
+      </FleetDrawer>
     </Box>
   );
 };
