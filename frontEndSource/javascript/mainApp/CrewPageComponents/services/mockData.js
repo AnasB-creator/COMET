@@ -38,15 +38,39 @@ export const mockCrewMember = {
       date: '2024-03-14',
       title: 'Weekly Health Assessment',
       subtitle: 'Regular Checkup',
-      content: 'All vital signs within normal parameters. Sleep patterns show slight irregularity.',
+      content: 'All vital signs within normal parameters. Sleep patterns show slight irregularity. Recommended monitoring of sleep cycle over next 48 hours. No immediate concerns identified.',
       riskLevel: 'low'
     },
     {
       id: 'R002',
+      date: '2024-03-12',
+      title: 'Radiation Exposure Alert',
+      subtitle: 'Environmental Monitoring',
+      content: 'Elevated radiation levels detected during last EVA activity. While within acceptable limits, crew member should limit external exposure for next 72 hours. Additional shielding protocols recommended.',
+      riskLevel: 'medium'
+    },
+    {
+      id: 'R003',
       date: '2024-03-07',
       title: 'Monthly Physical Evaluation',
       subtitle: 'Comprehensive Review',
-      content: 'Physical condition maintains optimal levels. Exercise routine effectiveness confirmed.',
+      content: 'Physical condition maintains optimal levels. Exercise routine effectiveness confirmed. Bone density readings stable. Cardiovascular performance exceeds baseline requirements.',
+      riskLevel: 'low'
+    },
+    {
+      id: 'R004',
+      date: '2024-03-01',
+      title: 'Emergency Medical Report',
+      subtitle: 'Incident Assessment',
+      content: 'Crew member experienced sudden dizziness during maintenance procedure. Immediate medical attention provided. Vital signs stabilized. Full neurological scan recommended. Temporary suspension from EVA duties.',
+      riskLevel: 'high'
+    },
+    {
+      id: 'R005',
+      date: '2024-02-28',
+      title: 'Psychological Evaluation',
+      subtitle: 'Quarterly Assessment',
+      content: 'Standard psychological evaluation completed. Stress levels slightly elevated but within expected range for mission duration. Sleep quality reported as satisfactory. Social engagement remains positive.',
       riskLevel: 'low'
     }
   ]

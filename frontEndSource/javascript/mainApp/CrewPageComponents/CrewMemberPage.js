@@ -4,6 +4,7 @@ import QuadrantLayout from './layout/QuadrantLayout';
 import CrewStatus from './crew/CrewStatus';
 import HealthMetricsQuadrant from './health/HealthMetricsQuadrant';
 import HealthProblems from './health/HealthProblems';
+import HealthReportsQuadrant from './reports/HealthReportsQuadrant';
 import { mockCrewMember } from './services/mockData';
 
 function CrewMemberPage() {
@@ -12,7 +13,7 @@ function CrewMemberPage() {
       <CrewStatus crewMember={mockCrewMember} />
       <HealthMetricsQuadrant crewMember={mockCrewMember} />
       <HealthProblems crewMember={mockCrewMember} />    
-      <Box>Health Reports (Coming Soon)</Box>
+      <HealthReportsQuadrant crewMember={mockCrewMember} />
     </QuadrantLayout>
   );
 }
