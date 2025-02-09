@@ -99,11 +99,24 @@ const FleetDrawer = ({ onFleetChange }) => {
           ) : (
             <VStack spacing={4} h="100%">
               <Button
-                leftIcon={<IoAddCircleOutline />}
+                leftIcon={<IoAddCircleOutline size={20} />}
                 onClick={() => setIsAddDialogOpen(true)}
-                variant="outline"
-                colorScheme="purple"
+                bgGradient="linear(to-r, purple.400, blue.500)"
+                color="white"
                 w="full"
+                h="12"
+                fontSize="lg"
+                fontWeight="medium"
+                _hover={{ 
+                  bgGradient: "linear(to-r, purple.500, blue.600)",
+                  transform: "translateY(-1px)",
+                  boxShadow: "lg"
+                }}
+                _active={{
+                  transform: "translateY(0)",
+                  boxShadow: "md"
+                }}
+                transition="all 0.2s"
               >
                 Add New Fleet
               </Button>

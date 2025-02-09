@@ -15,8 +15,8 @@ const MODEL_ZOOM_CONFIG = {
   1: 10,
   2: 15,
   3: 500,
-  4: 8,
-  5: 20,
+  4: 15,
+  5: 1800,
 };
 
 const getModelPathForFleet = (fleetId) => {
