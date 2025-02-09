@@ -20,7 +20,7 @@ import { motion } from 'framer-motion';
 const HeroSection = () => {
   return (
     <Container maxW="6xl" px={{ base: 6, md: 3 }} py={24}>
-      <Stack direction={{ base: 'column', md: 'row' }} justifyContent="center">
+      <Stack direction  ={{ base: 'column', md: 'row' }} justifyContent="center">
         <Stack direction="column" spacing={6} justifyContent="center" maxW="480px">
           <HStack
             as={motion.div}
@@ -135,7 +135,7 @@ const HeroSection = () => {
             h="100%"
             minW={{ base: "auto", md: "30rem" }}
             objectFit="cover"
-            src="/static/images/comets.png"
+            src="/static/images/comets_image.png"
             rounded="md"
             fallback={<Skeleton />}
             transition="transform 0.3s ease-in-out"
