@@ -6,9 +6,11 @@ import {
   Circle,
   Spinner,
   HStack,
+  IconButton,
 } from '@chakra-ui/react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, useGLTF } from '@react-three/drei';
+import { IoChevronBackOutline, IoChevronForwardOutline } from 'react-icons/io5';
 
 // Create a separate component for the 3D model
 function AstronautModel() {
@@ -19,7 +21,9 @@ function AstronautModel() {
 const CrewStatus = ({ 
   crewMember, 
   opacity = 0.7,
-  blurStrength = 8
+  blurStrength = 8,
+  onPrevious,
+  onNext,
 }) => {
   const statusColors = {
     active: 'green.400',
@@ -80,10 +84,64 @@ const CrewStatus = ({
       {/* Middle Section with 3D Model */}
       <Box
         position="relative"
-        overflow="hidden"
+        overflow="visible"
         boxSize={{ base: "200px", lg: "250px" }}
         bg="transparent"
       >
+        {/* Left Chevron */}
+        <IconButton
+          position="absolute"
+          left="-20px"
+          top="50%"
+          transform="translateY(-50%)"
+          variant="ghost"
+          color="whiteAlpha.900"
+          _hover={{
+            bg: 'whiteAlpha.100',
+            color: 'white',
+            transform: 'translateY(-50%) scale(1.1)',
+          }}
+          _active={{
+            transform: 'translateY(-50%) scale(0.95)',
+          }}
+          onClick={onPrevious}
+          zIndex={2}
+          aria-label="Previous crew member"
+          transition="all 0.2s"
+        >
+          
+            <IoChevronBackOutline size={24} />
+          
+        </IconButton>
+
+        {/* Right Chevron */}
+        <IconButton
+          position="absolute"
+          right="-20px"
+          top="50%"
+          transform="translateY(-50%)"
+          variant="ghost"
+          color="whiteAlpha.900"
+
+          _hover={{
+            bg: 'whiteAlpha.100',
+            color: 'white',
+            transform: 'translateY(-50%) scale(1.1)',
+          }}
+          _active={{
+            transform: 'translateY(-50%) scale(0.95)',
+          }}
+          onClick={onNext}
+          zIndex={2}
+          aria-label="Next crew member"
+          transition="all 0.2s"
+        >
+          
+            <IoChevronForwardOutline size={24} />
+          
+        </IconButton>
+
+
         <Canvas
           camera={{ position: [0, 0, 6], fov: 45 }}
           style={{ width: '100%', height: '100%' }}
