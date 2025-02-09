@@ -2,6 +2,7 @@ import React from 'react';
 // import { Provider } from "../components/ui/provider";
 import { Provider } from "../components/ui/provider"
 import Home from "./Home.js";
+import CrewMemberPage from './CrewPageComponents/CrewMemberPage';
 // Extend the theme to include global styles
 
 // const theme = extendTheme({
@@ -17,7 +18,7 @@ import Home from "./Home.js";
 const App = () => {
   return (
     <Provider >
-      <Home />
+      <CrewMemberPage />
     </Provider>
   );
 
