@@ -49,3 +49,11 @@ export const createCrewMember = async (crewMemberData) => {
   return response;
 };
 
+export const createHealthProblem = async (healthProblemData) => {
+  const response = await apiRequest('/api/health-problems-create/', {
+    method: 'POST',
+    body: healthProblemData,
+  });
+  return response;
+};
+

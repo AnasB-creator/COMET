@@ -6,6 +6,9 @@ import {
   Badge,
   Flex,
   createListCollection,
+  Button,
+  HStack,
+  Icon,
 } from '@chakra-ui/react';
 import { 
   SelectRoot, 
@@ -14,6 +17,9 @@ import {
   SelectItem,
   SelectValueText,
 } from '../../../components/ui/select';
+import { IoAddCircleOutline } from 'react-icons/io5';
+import { useHealthProblemMutation } from '../hooks/useHealthProblemMutation';
+import AddHealthProblemDialog from './AddHealthProblemDialog';
 
 function ProblemItem({ date, status, description, severity }) {
   return (
@@ -49,8 +55,10 @@ function ProblemItem({ date, status, description, severity }) {
   );
 }
 
-function HealthProblems({ crewMember }) {
+function HealthProblems({ crewMember, opacity = 0.7, blurStrength = 8 }) {
   const [filter, setFilter] = useState('all');
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const createHealthProblemMutation = useHealthProblemMutation();
   
   const glassEffect = {
     background: `rgba(26, 32, 44, 0.2)`,
@@ -79,18 +87,43 @@ function HealthProblems({ crewMember }) {
     setFilter(newValue);
   };
 
+  const handleAddHealthProblem = async (healthProblemData) => {
+    try {
+      await createHealthProblemMutation.mutateAsync({
+        ...healthProblemData,
+        crew_member: crewMember.id.replace('CM', ''), // Remove 'CM' prefix
+      });
+      // Success notification could be added here
+    } catch (error) {
+      console.error('Error creating health problem:', error);
+      // Error notification could be added here
+    }
+  };
+
   return (
-    <Box
-      {...glassEffect}
-      p={4}
-      h="100%"
-      display="flex"
-      flexDirection="column"
-    >
-      <Flex justify="space-between" align="center" mb={4}>
-        <Text fontSize="xl" fontWeight="bold" color="white">
-          Health Problems
-        </Text>
+    <>
+      <Box
+        {...glassEffect}
+        p={4}
+        h="100%"
+        display="flex"
+        flexDirection="column"
+      >
+        <Flex justify="space-between" align="center" mb={4}>
+          <Text fontSize="xl" fontWeight="bold" color="white">
+            Health Problems
+          </Text>
+          <Button
+            leftIcon={<Icon as={IoAddCircleOutline} />}
+            variant="ghost"
+            color="white"
+            _hover={{ bg: 'whiteAlpha.200' }}
+            onClick={() => setIsAddDialogOpen(true)}
+          >
+            Add Problem
+          </Button>
+        </Flex>
+
         <SelectRoot 
           value={filter} 
           onValueChange={handleFilterChange}
@@ -110,43 +143,52 @@ function HealthProblems({ crewMember }) {
             ))}
           </SelectContent>
         </SelectRoot>
-      </Flex>
 
-      <VStack
-        spacing={3}
-        align="stretch"
-        overflowY="auto"
-        flex="1"
-        css={{
-          '&::-webkit-scrollbar': {
-            width: '4px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'rgba(0, 0, 0, 0.1)',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: 'rgba(255, 255, 255, 0.3)',
-            borderRadius: '2px',
-          },
-        }}
-      >
-        {filteredProblems.length === 0 ? (
-          <Text color="gray.400" textAlign="center">
-            No health problems found
-          </Text>
-        ) : (
-          filteredProblems.map((problem) => (
-            <ProblemItem
-              key={problem.id}
-              date={problem.date}
-              status={problem.status}
-              description={problem.description}
-              severity={problem.severity}
-            />
-          ))
-        )}
-      </VStack>
-    </Box>
+        <VStack
+          spacing={3}
+          align="stretch"
+          overflowY="auto"
+          flex="1"
+          css={{
+            '&::-webkit-scrollbar': {
+              width: '4px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'rgba(0, 0, 0, 0.1)',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: 'rgba(255, 255, 255, 0.3)',
+              borderRadius: '2px',
+            },
+          }}
+        >
+          {filteredProblems.length === 0 ? (
+            <Text color="gray.400" textAlign="center">
+              No health problems found
+            </Text>
+          ) : (
+            filteredProblems.map((problem) => (
+              <ProblemItem
+                key={problem.id}
+                date={problem.date}
+                status={problem.status}
+                description={problem.description}
+                severity={problem.severity}
+              />
+            ))
+          )}
+        </VStack>
+      </Box>
+
+      <AddHealthProblemDialog
+        isOpen={isAddDialogOpen}
+        onClose={() => setIsAddDialogOpen(false)}
+        onSubmit={handleAddHealthProblem}
+        crewMember={crewMember}
+        opacity={opacity}
+        blurStrength={blurStrength}
+      />
+    </>
   );
 }
 

@@ -196,3 +196,48 @@ def create_crew_member(request):
             {'error': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+@api_view(['POST'])
+def create_health_problem(request):
+    try:
+        # Extract crew member ID from the format 'CM001' to just '1'
+        crew_member_id = request.data.get('crew_member')
+        if crew_member_id.startswith('CM'):
+            crew_member_id = int(crew_member_id[1:])
+
+        # Parse the date string to a datetime object
+        date = timezone.datetime.strptime(
+            request.data.get('date'),
+            '%Y-%m-%d'
+        )
+
+        # Create health problem
+        health_problem = HealthProblem.objects.create(
+            crew_member_id=crew_member_id,
+            date=date,
+            description=request.data.get('description'),
+            severity=request.data.get('severity'),
+            status=request.data.get('status')
+        )
+
+        # Format response data
+        response_data = {
+            'id': f'P{health_problem.id:03d}',
+            'date': health_problem.date.isoformat(),
+            'description': health_problem.description,
+            'severity': health_problem.severity,
+            'status': health_problem.status
+        }
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
+    except KeyError as e:
+        return Response(
+            {'error': f'Missing required field: {str(e)}'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
