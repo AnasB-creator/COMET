@@ -57,3 +57,11 @@ export const createHealthProblem = async (healthProblemData) => {
   return response;
 };
 
+export const createHealthReport = async (healthReportData) => {
+  const response = await apiRequest('/api/health-reports-create/', {
+    method: 'POST',
+    body: healthReportData,
+  });
+  return response;
+};
+

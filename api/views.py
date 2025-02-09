@@ -241,3 +241,59 @@ def create_health_problem(request):
             {'error': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+@api_view(['POST'])
+def create_health_report(request):
+    try:
+        # Extract crew member ID from the format 'CM001' to just '1'
+        crew_member_id = request.data.get('crew_member')
+        if crew_member_id.startswith('CM'):
+            crew_member_id = int(crew_member_id[2:])
+
+        # Parse the date string to a datetime object
+        date = timezone.datetime.strptime(
+            request.data.get('date'),
+            '%Y-%m-%d'
+        )
+
+        # Get risk_level from request data, using the correct field name
+        risk_level = request.data.get('risk_level')  # Changed from riskLevel
+        
+        if not risk_level:
+            return Response(
+                {'error': 'risk_level is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Create health report
+        health_report = IndividualHealthReport.objects.create(
+            crew_member_id=crew_member_id,
+            date=date,
+            title=request.data.get('title'),
+            subtitle=request.data.get('subtitle'),
+            content=request.data.get('content'),
+            risk_level=risk_level  # Changed from riskLevel
+        )
+
+        # Format response data
+        response_data = {
+            'id': f'R{health_report.id:03d}',
+            'date': health_report.date.isoformat(),
+            'title': health_report.title,
+            'subtitle': health_report.subtitle,
+            'content': health_report.content,
+            'riskLevel': health_report.risk_level  # Keep as riskLevel in response for frontend
+        }
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
+    except KeyError as e:
+        return Response(
+            {'error': f'Missing required field: {str(e)}'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

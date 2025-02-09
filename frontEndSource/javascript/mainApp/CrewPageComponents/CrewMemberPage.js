@@ -5,7 +5,7 @@ import QuadrantLayout from './layout/QuadrantLayout';
 import CrewStatus from './crew/CrewStatus';
 import HealthMetricsQuadrant from './health/HealthMetricsQuadrant';
 import HealthProblems from './health/HealthProblems';
-import HealthReportsQuadrant from './reports/HealthReportsQuadrant';
+import {HealthReportsQuadrant} from './reports/HealthReportsQuadrant';
 import { useCrewMemberMutation } from './hooks/useCrewMemberMutation';
 
 function CrewMemberPage() {
@@ -58,6 +58,8 @@ function CrewMemberPage() {
       // You might want to handle this error in the UI
     }
   };
+
+
 
   if (isLoading) {
     return (
