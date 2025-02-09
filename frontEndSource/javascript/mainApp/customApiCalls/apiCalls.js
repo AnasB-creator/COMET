@@ -34,10 +34,12 @@ const apiRequest = async (endpoint, options = {}) => {
   }
 };
 
-export const getCrewMembersData = async () => {
-  const response = await apiRequest('/api/crew-members/', {
+export const getCrewMembersData = async (fleetId) => {
+  console.log('Fetching crew members for fleet:', fleetId);
+  const response = await apiRequest(`/api/crew-members/?fleet=${fleetId}`, {
     method: 'GET',
   });
+  console.log('API Response:', response);
   return response;
 };
 
@@ -61,6 +63,21 @@ export const createHealthReport = async (healthReportData) => {
   const response = await apiRequest('/api/health-reports-create/', {
     method: 'POST',
     body: healthReportData,
+  });
+  return response;
+};
+
+export const getFleets = async () => {
+  const response = await apiRequest('/api/fleets/', {
+    method: 'GET',
+  });
+  return response;
+};
+
+export const createFleet = async (fleetData) => {
+  const response = await apiRequest('/api/fleets-create/', {
+    method: 'POST',
+    body: fleetData,
   });
   return response;
 };
