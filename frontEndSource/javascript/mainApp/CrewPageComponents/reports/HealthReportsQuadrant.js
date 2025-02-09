@@ -1,77 +1,131 @@
 import React, { useState } from 'react';
-import { Box, Heading, Text, VStack } from '@chakra-ui/react';
+import { Box, Heading, Text, VStack, Flex } from '@chakra-ui/react';
 import RiskLevelFilter from './components/RiskLevelFilter';
 import ReportCard from './components/ReportCard';
+import { GenerateReportButton } from './components/GenerateReportButton';
 
-const HealthReportsQuadrant = ({ crewMember }) => {
+export function HealthReportsQuadrant({ 
+  crewMember,
+  opacity = 0.2,
+  blurStrength = 8,
+}) {
   const [selectedRiskLevel, setSelectedRiskLevel] = useState('all');
+
+  const handleRiskLevelChange = (level) => {
+    setSelectedRiskLevel(level);
+  };
 
   const filteredReports = React.useMemo(() => {
     if (!crewMember?.reports) return [];
-    if (selectedRiskLevel === 'all') return crewMember.reports;
-    return crewMember.reports.filter(report => report.riskLevel === selectedRiskLevel);
+    
+    return selectedRiskLevel === 'all' 
+      ? crewMember.reports
+      : crewMember.reports.filter(report => 
+          report.riskLevel.toLowerCase() === selectedRiskLevel.toLowerCase()
+        );
   }, [crewMember?.reports, selectedRiskLevel]);
 
   if (!crewMember || !crewMember.reports) {
     return (
       <Box
+        className="quadrant"
+        style={{
+          backgroundColor: `rgba(26, 32, 44, ${opacity})`,
+          backdropFilter: `blur(${blurStrength}px)`,
+          transition: 'all 0.3s ease',
+        }}
+        position="relative"
         height="100%"
-        bg="rgba(26, 32, 44, 0.2)"
-        backdropFilter="blur(8px)"
-        borderRadius="lg"
-        p={4}
       >
-        <Heading size="lg" color="gray.100">Health Reports</Heading>
-        <Text color="gray.300">No health reports available</Text>
+        <Flex align="center" justify="space-between" p={4}>
+          <Heading size="md">Health Reports</Heading>
+          <Flex gap={4} align="center">
+            <RiskLevelFilter 
+              selectedRiskLevel={selectedRiskLevel}
+              onRiskLevelChange={handleRiskLevelChange}
+            />
+            <GenerateReportButton 
+              crewMemberId={crewMember?.id}
+            />
+          </Flex>
+        </Flex>
+
+        <VStack spacing={4} p={4}>
+          <Box textAlign="center" p={8}>
+            <Box>No health reports available</Box>
+          </Box>
+        </VStack>
       </Box>
     );
   }
 
   return (
     <Box
-      height="100%"
-      bg="rgba(26, 32, 44, 0.2)"
-      backdropFilter="blur(8px)"
-      borderRadius="lg"
-      p={4}
+      className="quadrant"
+      style={{
+        backgroundColor: `rgba(26, 32, 44, ${opacity})`,
+        backdropFilter: `blur(${blurStrength}px)`,
+        transition: 'all 0.3s ease',
+      }}
       position="relative"
+      height="100%"
       overflow="hidden"
     >
-      <Heading size="lg" color="gray.100" mb={4}>Health Reports</Heading>
-      
-      <Box
-        overflowY="auto"
-        height="calc(100% - 60px)"
-        css={{
-          '&::-webkit-scrollbar': {
-            width: '4px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'rgba(0, 0, 0, 0.1)',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: 'rgba(255, 255, 255, 0.3)',
-            borderRadius: '4px',
-          },
-        }}
+      <Flex 
+        direction="column" 
+        height="100%"
       >
-        <RiskLevelFilter 
-          selectedRiskLevel={selectedRiskLevel}
-          onRiskLevelChange={setSelectedRiskLevel}
-        />
-        <VStack spacing={3} align="stretch">
-          {filteredReports.map((report) => (
-            <ReportCard key={report.id} report={report} />
-          ))}
-          {filteredReports.length === 0 && (
-            <Text color="gray.300" textAlign="center">
-              No reports found for the selected risk level
-            </Text>
-          )}
-        </VStack>
-      </Box>
+        <Flex align="center" justify="space-between" p={4}>
+          <Heading size="md">Health Reports</Heading>
+          <Flex gap={4} align="center">
+            <RiskLevelFilter 
+              selectedRiskLevel={selectedRiskLevel}
+              onRiskLevelChange={handleRiskLevelChange}
+            />
+            <GenerateReportButton 
+              crewMemberId={crewMember?.id}
+            />
+          </Flex>
+        </Flex>
+
+        <Box 
+          flex="1"
+          overflowY="auto"
+          px={4}
+          pb={4}
+          css={{
+            '&::-webkit-scrollbar': {
+              width: '4px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'rgba(0, 0, 0, 0.1)',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: 'rgba(255, 255, 255, 0.3)',
+              borderRadius: '4px',
+            },
+          }}
+        >
+          <VStack 
+            spacing={4} 
+            align="stretch"
+          >
+            {filteredReports.length > 0 ? (
+              filteredReports.map((report) => (
+                <ReportCard 
+                  key={report.id}
+                  report={report}
+                  width="100%"
+                />
+              ))
+            ) : (
+              <Box textAlign="center" p={8}>
+                <Box>No health reports available for this risk level</Box>
+              </Box>
+            )}
+          </VStack>
+        </Box>
+      </Flex>
     </Box>
   );
-};
-
-export default HealthReportsQuadrant; 
+} 
