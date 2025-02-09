@@ -11,6 +11,8 @@ from .models import CrewMember, HealthMetrics, HealthProblem, IndividualHealthRe
 from django.db.models import Prefetch
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from anthropic import Anthropic
+from django.conf import settings
 
 User = get_user_model()
 # Create your views here.
@@ -374,6 +376,110 @@ def create_health_report(request):
         return Response(
             {'error': f'Missing required field: {str(e)}'},
             status=status.HTTP_400_BAD_REQUEST
+        )
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+def generate_ai_health_report(request):
+    try:
+        # Extract crew member ID from the format 'CM001'
+        crew_member_id = request.data.get('crew_member')
+        if crew_member_id.startswith('CM'):
+            crew_member_id = int(crew_member_id[2:])
+            
+        # Get crew member and their data
+        crew_member = CrewMember.objects.prefetch_related(
+            'health_metrics',
+            'health_problems'
+        ).get(id=crew_member_id)
+        
+        # Get latest health data
+        latest_metrics = crew_member.health_metrics.first()
+        active_problems = crew_member.health_problems.filter(status='active')
+        
+        # Prepare prompt for AI
+        prompt = f"""You are a medical AI assistant. Analyze the following health data and generate a detailed health report.
+
+Crew Member: {crew_member.first_name} {crew_member.last_name}
+Role: {crew_member.role}
+Status: {crew_member.status}
+
+Latest Health Metrics:
+- Heart Rate: {latest_metrics.heart_rate if latest_metrics else 'No data'}
+- Blood Oxygen: {latest_metrics.blood_oxygen if latest_metrics else 'No data'}
+- Sleep Duration: {latest_metrics.sleep_duration if latest_metrics else 'No data'}
+- Exercise Level: {latest_metrics.exercise_level if latest_metrics else 'No data'}
+- Radiation Exposure: {latest_metrics.radiation if latest_metrics else 'No data'}
+
+Active Health Problems:
+{[f"- {p.description} (Severity: {p.severity})" for p in active_problems]}
+
+Please provide:
+1. A brief health assessment
+2. Key risk factors
+3. Specific recommendations
+4. Overall risk level (low, medium, or high)
+"""
+
+        # Initialize Anthropic client
+        client = Anthropic(api_key=settings.CLAUDE_API_KEY)
+        
+        # Get AI response
+        response = client.messages.create(
+            model="claude-3-sonnet-20240229",
+            max_tokens=1000,
+            temperature=0,
+            system="You are a medical AI specializing in space crew health assessment. Provide concise, practical health insights.",
+            messages=[{
+                "role": "user",
+                "content": prompt
+            }]
+        )
+        
+        # Parse AI response
+        ai_analysis = response.content[0].text
+        
+        # Extract risk level from AI response (assuming it's in the last line)
+        risk_level = "medium"  # default
+        if "risk level: low" in ai_analysis.lower():
+            risk_level = "low"
+        elif "risk level: high" in ai_analysis.lower():
+            risk_level = "high"
+        
+        # Create health report
+        report = IndividualHealthReport.objects.create(
+            crew_member=crew_member,
+            date=timezone.now(),
+            title=f"AI Health Assessment - {crew_member.first_name} {crew_member.last_name}",
+            subtitle=f"Generated Report - Risk Level: {risk_level.upper()}",
+            content={
+                "analysis": ai_analysis,
+                "metrics_id": latest_metrics.id if latest_metrics else None,
+                "active_problems": [p.id for p in active_problems]
+            },
+            risk_level=risk_level
+        )
+        
+        # Format response
+        response_data = {
+            'id': f'R{report.id:03d}',
+            'date': report.date.isoformat(),
+            'title': report.title,
+            'subtitle': report.subtitle,
+            'content': report.content,
+            'riskLevel': report.risk_level
+        }
+        
+        return Response(response_data, status=status.HTTP_201_CREATED)
+        
+    except CrewMember.DoesNotExist:
+        return Response(
+            {'error': 'Crew member not found'},
+            status=status.HTTP_404_NOT_FOUND
         )
     except Exception as e:
         return Response(
