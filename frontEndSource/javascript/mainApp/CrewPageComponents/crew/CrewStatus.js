@@ -11,12 +11,36 @@ import {
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, useGLTF } from '@react-three/drei';
 import { IoChevronBackOutline, IoChevronForwardOutline } from 'react-icons/io5';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Create a separate component for the 3D model
 function AstronautModel() {
   const { scene } = useGLTF('/static/images/cute_astronaut_gltf/scene.gltf');
   return <primitive object={scene} scale={2.5} position={[0, -0.25, 0]} />;
 }
+
+const statusColors = {
+  active: 'green.400',
+  inactive: 'gray.400',
+  critical: 'red.400'
+};
+
+const slideVariants = {
+  enter: (direction) => ({
+    x: direction > 0 ? 200 : -200,
+    opacity: 0
+  }),
+  center: {
+    zIndex: 1,
+    x: 0,
+    opacity: 1
+  },
+  exit: (direction) => ({
+    zIndex: 0,
+    x: direction < 0 ? 200 : -200,
+    opacity: 0
+  })
+};
 
 const CrewStatus = ({ 
   crewMember, 
@@ -25,19 +49,25 @@ const CrewStatus = ({
   onPrevious,
   onNext,
 }) => {
-  const statusColors = {
-    active: 'green.400',
-    inactive: 'gray.400',
-    critical: 'red.400'
+  const [slideDirection, setSlideDirection] = React.useState(0);
+  const [canvasKey, setCanvasKey] = React.useState(0);
+
+  const handlePrevious = () => {
+    setSlideDirection(-1);
+    setCanvasKey(prev => prev + 1);
+    onPrevious();
   };
 
-  const bgColor = `rgba(26, 32, 44, ${opacity})`;
-  const blurEffect = `blur(${blurStrength}px)`;
+  const handleNext = () => {
+    setSlideDirection(1);
+    setCanvasKey(prev => prev + 1);
+    onNext();
+  };
 
   return (
     <VStack
-      bg={bgColor}
-      backdropFilter={blurEffect}
+      bg={`rgba(26, 32, 44, ${opacity})`}
+      backdropFilter={`blur(${blurStrength}px)`}
       borderRadius="xl"
       p={6}
       spacing={4}
@@ -47,14 +77,12 @@ const CrewStatus = ({
       justify="space-between"
       border="1px solid"
       borderColor="whiteAlpha.200"
-      transition="all 0.3s ease"
     >
       {/* Top Section with Fleet Info */}
       <VStack 
         spacing={2} 
         w="100%"
-        divideY
-        divideColor="whiteAlpha.200"
+        divider={<Box borderColor="whiteAlpha.200" />}
       >
         <HStack justify="space-between" w="100%">
           <Text 
@@ -81,84 +109,94 @@ const CrewStatus = ({
         </Text>
       </VStack>
 
-      {/* Middle Section with 3D Model */}
-      <Box
-        position="relative"
+      {/* Updated 3D Model Section with Navigation */}
+      <Box 
+        position="relative" 
+        width="100%" 
+        height={{ base: "200px", lg: "250px" }}
         overflow="visible"
-        boxSize={{ base: "200px", lg: "250px" }}
-        bg="transparent"
       >
-        {/* Left Chevron */}
         <IconButton
           position="absolute"
-          left="-20px"
+          left="0px"
           top="50%"
           transform="translateY(-50%)"
           variant="ghost"
           color="whiteAlpha.900"
-          _hover={{
-            bg: 'whiteAlpha.100',
-            color: 'white',
-            transform: 'translateY(-50%) scale(1.1)',
-          }}
-          _active={{
-            transform: 'translateY(-50%) scale(0.95)',
-          }}
-          onClick={onPrevious}
+          onClick={handlePrevious}
           zIndex={2}
           aria-label="Previous crew member"
-          transition="all 0.2s"
+          _hover={{
+            bg: 'whiteAlpha.100',
+            color: 'white',
+          }}
         >
-          
-            <IoChevronBackOutline size={24} />
-          
+          <IoChevronBackOutline size={24} />
         </IconButton>
 
-        {/* Right Chevron */}
         <IconButton
           position="absolute"
-          right="-20px"
+          right="0px"
           top="50%"
           transform="translateY(-50%)"
           variant="ghost"
           color="whiteAlpha.900"
-
+          onClick={handleNext}
+          zIndex={2}
+          aria-label="Next crew member"
           _hover={{
             bg: 'whiteAlpha.100',
             color: 'white',
-            transform: 'translateY(-50%) scale(1.1)',
           }}
-          _active={{
-            transform: 'translateY(-50%) scale(0.95)',
-          }}
-          onClick={onNext}
-          zIndex={2}
-          aria-label="Next crew member"
-          transition="all 0.2s"
         >
-          
-            <IoChevronForwardOutline size={24} />
-          
+          <IoChevronForwardOutline size={24} />
         </IconButton>
 
-
-        <Canvas
-          camera={{ position: [0, 0, 6], fov: 45 }}
-          style={{ width: '100%', height: '100%' }}
+        <Box
+          position="relative"
+          width="100%"
+          height="100%"
+          overflow="hidden"
         >
-          <ambientLight intensity={0.5} />
-          <pointLight position={[10, 10, 10]} />
-          <Suspense fallback={null}>
-            <AstronautModel />
-          </Suspense>
-          <OrbitControls 
-            enableZoom={false}
-            enablePan={false}
-            autoRotate
-            autoRotateSpeed={4}
-          />
-        </Canvas>
-        
+          <AnimatePresence initial={false} custom={slideDirection} mode="wait">
+            <motion.div
+              key={crewMember.id}
+              custom={slideDirection}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{
+                x: { type: "spring", stiffness: 300, damping: 30 },
+                opacity: { duration: 0.2 }
+              }}
+              style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%'
+              }}
+            >
+              <Canvas 
+                key={canvasKey}
+                camera={{ position: [0, 0, 6], fov: 45 }}
+                style={{ width: '100%', height: '100%' }}
+              >
+                <ambientLight intensity={0.5} />
+                <pointLight position={[10, 10, 10]} />
+                <Suspense fallback={null}>
+                  <AstronautModel />
+                </Suspense>
+                <OrbitControls 
+                  enableZoom={false}
+                  enablePan={false}
+                  autoRotate
+                  autoRotateSpeed={4}
+                />
+              </Canvas>
+            </motion.div>
+          </AnimatePresence>
+        </Box>
+
         <Circle
           size="16px"
           bg={statusColors[crewMember.status]}
@@ -173,7 +211,6 @@ const CrewStatus = ({
       <VStack 
         spacing={2} 
         textAlign="center"
-        bg="transparent"
       >
         <Text 
           fontSize="2xl" 
