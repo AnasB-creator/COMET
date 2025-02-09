@@ -73,6 +73,7 @@ function CrewMemberPage() {
         crewMember={currentCrewMember}
         onPrevious={handlePrevious}
         onNext={handleNext}
+        totalCrewCount={fleetMembers.length}
       />
       <HealthMetricsQuadrant crewMember={currentCrewMember} />
       <HealthProblems crewMember={currentCrewMember} />    
