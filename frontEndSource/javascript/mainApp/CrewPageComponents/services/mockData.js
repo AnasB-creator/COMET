@@ -1,20 +1,20 @@
-const mockCrewMember = {
+export const mockCrewMember = {
   id: 'CM001',
   name: 'Sarah Chen',
   role: 'Flight Engineer',
   status: 'active',
   avatar: null,
-  metrics: {
-    heartRate: 72,
-    sleepDuration: 7.5,
-    respirationRate: 16,
-    bloodOxygen: 98,
-    boneDensity: 95,
-    radiation: 0.12,
-    exerciseLevel: 85,
-    outsideTime: 2.5,
-    weight: 68,
-    height: 170
+  healthMetrics: {
+    heartRate: { value: 72, unit: 'bpm', status: 'normal' },
+    sleepDuration: { value: 7.5, unit: 'hours', status: 'normal' },
+    respirationRate: { value: 16, unit: 'rpm', status: 'normal' },
+    bloodOxygen: { value: 98, unit: '%', status: 'normal' },
+    boneDensity: { value: 95, unit: '%', status: 'normal' },
+    radiation: { value: 0.12, unit: 'mSv', status: 'normal' },
+    exerciseLevel: { value: 85, unit: '%', status: 'normal' },
+    outsideTime: { value: 2.5, unit: 'hrs', status: 'normal' },
+    weight: { value: 68, unit: 'kg', status: 'normal' },
+    height: { value: 170, unit: 'cm', status: 'normal' }
   },
   problems: [
     {
@@ -56,6 +56,4 @@ export const getMockCrewMember = () => {
   return Promise.resolve(mockCrewMember);
 };
 
-export default {
-  getMockCrewMember
-}; 
+export default mockCrewMember; 
