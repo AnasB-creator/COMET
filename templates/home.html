@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}COMET{% endblock %}
+{% block head %}<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rasa:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiko:wght@400;600;700&display=swap" rel="stylesheet">
+
+{% endblock %}
+{% block content %}
+    <meta name="backendLink" content="" />
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <meta name="userEmail" content="{{ userEmail }}">
+
+<div id="root" style="height: 100%;"></div>
+
+<script type="application/javascript" src="{% static 'js/homeMainApp.bundle.js' %}"></script>
+{% endblock %}
+
