@@ -1,6 +1,6 @@
 import React from 'react';
-import { IconButton, Box, Text } from '@chakra-ui/react';
-import { IoChevronDown } from 'react-icons/io5';
+import { IconButton, Box, Text, HStack, Button } from '@chakra-ui/react';
+import { IoChevronDown, IoChevronBackOutline, IoChevronForwardOutline } from 'react-icons/io5';
 import {
   DrawerRoot,
   DrawerBackdrop,
@@ -11,8 +11,16 @@ import {
   DrawerTrigger,
   DrawerCloseTrigger,
 } from '../../components/ui/drawer';
+import FleetAvatar from './FleetAvatar';
 
 const FleetDrawer = ({ children }) => {
+  // Mock data for testing - will be replaced with real data
+  const mockFleet = {
+    name: "Deep Space Fleet",
+    companyName: "Space Corp",
+    crewCount: 42
+  };
+
   return (
     <DrawerRoot placement="top">
       <DrawerBackdrop />
@@ -48,9 +56,31 @@ const FleetDrawer = ({ children }) => {
           <DrawerTitle color="white">Fleet Management</DrawerTitle>
         </DrawerHeader>
         <DrawerBody>
-          {children}
+          <HStack spacing={4} justify="center" align="center" h="100%">
+            <IconButton
+              aria-label="Previous fleet"
+              variant="ghost"
+              color="white"
+              size="lg"
+              _hover={{ bg: 'whiteAlpha.200' }}
+            >
+                <IoChevronBackOutline />
+            </IconButton>
+            <FleetAvatar fleet={mockFleet} />
+            <IconButton
+              aria-label="Next fleet"
+              variant="ghost"
+              color="white"
+              size="lg"
+
+              _hover={{ bg: 'whiteAlpha.200' }}
+            >
+                <IoChevronForwardOutline />
+            </IconButton>
+          </HStack>
         </DrawerBody>
         <DrawerCloseTrigger 
+
           position="absolute"
           top={4}
           right={4}
