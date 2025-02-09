@@ -86,27 +86,37 @@ const FleetDrawer = ({ onFleetChange }) => {
             </Center>
           ) : (
             <HStack spacing={4} justify="center" align="center" h="100%">
-              <Button
-                leftIcon={<IoChevronBackOutline size={24} />}
+              <IconButton
                 variant="ghost"
                 color="white"
                 size="lg"
                 onClick={handlePrevious}
                 isDisabled={!fleets?.length}
                 _hover={{ bg: 'whiteAlpha.200' }}
-              />
+                bg="rgba(26, 32, 44, 0.8)"
+                boxShadow="0 0 10px rgba(0,0,0,0.3)"
+                border="1px solid"
+                borderColor="whiteAlpha.200"
+              >
+                <IoChevronBackOutline size={24} />
+              </IconButton>
               
               {currentFleet && <FleetAvatar fleet={currentFleet} />}
               
-              <Button
-                rightIcon={<IoChevronForwardOutline size={24} />}
+              <IconButton
                 variant="ghost"
                 color="white"
                 size="lg"
                 onClick={handleNext}
                 isDisabled={!fleets?.length}
                 _hover={{ bg: 'whiteAlpha.200' }}
-              />
+                bg="rgba(26, 32, 44, 0.8)"
+                boxShadow="0 0 10px rgba(0,0,0,0.3)"
+                border="1px solid"
+                borderColor="whiteAlpha.200"
+              >
+                <IoChevronForwardOutline size={24} />
+              </IconButton>
             </HStack>
           )}
         </DrawerBody>
