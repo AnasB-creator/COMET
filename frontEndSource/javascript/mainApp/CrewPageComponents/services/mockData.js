@@ -1,11 +1,17 @@
 export const mockCrewMembers = [
   {
     id: 'CM001',
-    name: 'Sarah Chen',
+    firstName: 'Sarah',
+    lastName: 'Chen',
     role: 'Flight Engineer',
     status: 'active',
+    sex: 'F',
+    dateOfBirth: '1990-05-15',
     avatar: null,
+    fleetId: 'F001',
+    userId: 'U001',
     healthMetrics: {
+      date: '2024-03-15',
       heartRate: { value: 72, unit: 'bpm', status: 'normal' },
       sleepDuration: { value: 7.5, unit: 'hours', status: 'normal' },
       respirationRate: { value: 16, unit: 'rpm', status: 'normal' },
@@ -112,11 +118,17 @@ export const mockCrewMembers = [
   },
   {
     id: 'CM002',
-    name: 'Marcus Rodriguez',
+    firstName: 'Marcus',
+    lastName: 'Rodriguez',
     role: 'Medical Officer',
     status: 'active',
+    sex: 'M',
+    dateOfBirth: '1988-08-22',
     avatar: null,
+    fleetId: 'F001',
+    userId: 'U001',
     healthMetrics: {
+      date: '2024-03-15',
       heartRate: { value: 72, unit: 'bpm', status: 'normal' },
       sleepDuration: { value: 7.5, unit: 'hours', status: 'normal' },
       respirationRate: { value: 16, unit: 'rpm', status: 'normal' },
@@ -232,4 +244,35 @@ export const getMockCrewMemberById = (id) => {
 
 export const getAllCrewMembers = () => {
   return Promise.resolve(mockCrewMembers);
-}; 
+};
+
+export const getMockFleetById = (id) => {
+  return Promise.resolve(
+    mockFleets.find(fleet => fleet.id === id) || null
+  );
+};
+
+export const getMockUserById = (id) => {
+  return Promise.resolve(
+    mockUsers.find(user => user.id === id) || null
+  );
+};
+
+// Add mock fleet data
+export const mockFleets = [
+  {
+    id: 'F001',
+    name: 'Deep Space Explorer',
+    companyName: 'Space Ventures Inc.',
+    userId: 'U001' // Fleet captain/supervisor
+  }
+];
+
+// Add mock user data
+export const mockUsers = [
+  {
+    id: 'U001',
+    name: 'John Smith',
+    role: 'Fleet Captain'
+  }
+]; 

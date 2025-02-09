@@ -33,7 +33,9 @@ const HealthMetricsQuadrant = ({ crewMember }) => {
       position="relative"
       overflow="hidden"
     >
-      <Heading size="lg" color="gray.100" mb={4}>Health Metrics</Heading>
+      <Heading size="lg" color="gray.100" mb={4}>
+        Health Metrics - {new Date(healthMetrics.date).toLocaleDateString()}
+      </Heading>
       <Box
         overflowY="auto"
         height="calc(100% - 60px)"
@@ -51,15 +53,17 @@ const HealthMetricsQuadrant = ({ crewMember }) => {
         }}
       >
         <VStack spacing={3} align="stretch">
-          {Object.entries(healthMetrics).map(([key, value]) => (
-            <MetricCard 
-              key={key}
-              label={key}
-              value={value.value}
-              unit={value.unit}
-              status={value.status}
-            />
-          ))}
+          {Object.entries(healthMetrics)
+            .filter(([key]) => key !== 'date') // Exclude date from metrics display
+            .map(([key, value]) => (
+              <MetricCard 
+                key={key}
+                label={key}
+                value={value.value}
+                unit={value.unit}
+                status={value.status}
+              />
+            ))}
         </VStack>
       </Box>
     </Box>

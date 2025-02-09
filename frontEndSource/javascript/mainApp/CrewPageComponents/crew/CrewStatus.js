@@ -88,7 +88,7 @@ const CrewStatus = ({
           color="white"
           textShadow="0 0 10px rgba(0,0,0,0.5)"
         >
-          {crewMember.name}
+          {`${crewMember.firstName} ${crewMember.lastName}`}
         </Text>
         <Text 
           fontSize="md"
