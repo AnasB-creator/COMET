@@ -37,9 +37,20 @@ export function HealthReportsQuadrant({
         position="relative"
         height="100%"
       >
-        <Flex align="center" justify="space-between" p={4}>
+        <Flex 
+          align="center" 
+          justify="space-between" 
+          p={4}
+          flexDirection={{ base: "column", md: "row" }}
+          gap={4}
+        >
           <Heading size="md">Health Reports</Heading>
-          <Flex gap={4} align="center">
+          <Flex 
+            gap={4} 
+            align="center"
+            flexDirection={{ base: "column", sm: "row" }}
+            width={{ base: "100%", md: "auto" }}
+          >
             <RiskLevelFilter 
               selectedRiskLevel={selectedRiskLevel}
               onRiskLevelChange={handleRiskLevelChange}
@@ -75,9 +86,20 @@ export function HealthReportsQuadrant({
         direction="column" 
         height="100%"
       >
-        <Flex align="center" justify="space-between" p={4}>
+        <Flex 
+          align="center" 
+          justify="space-between" 
+          p={4}
+          flexDirection={{ base: "column", md: "row" }}
+          gap={4}
+        >
           <Heading size="md">Health Reports</Heading>
-          <Flex gap={4} align="center">
+          <Flex 
+            gap={4} 
+            align="center"
+            flexDirection={{ base: "column", sm: "row" }}
+            width={{ base: "100%", md: "auto" }}
+          >
             <RiskLevelFilter 
               selectedRiskLevel={selectedRiskLevel}
               onRiskLevelChange={handleRiskLevelChange}

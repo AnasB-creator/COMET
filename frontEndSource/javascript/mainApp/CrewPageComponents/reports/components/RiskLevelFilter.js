@@ -1,5 +1,5 @@
 import React from 'react';
-import { ButtonGroup, Button, HStack, Text } from '@chakra-ui/react';
+import { ButtonGroup, Button, HStack, Text, VStack } from '@chakra-ui/react';
 
 const RiskLevelFilter = ({ selectedRiskLevel, onRiskLevelChange }) => {
   const riskLevels = [
@@ -10,9 +10,19 @@ const RiskLevelFilter = ({ selectedRiskLevel, onRiskLevelChange }) => {
   ];
 
   return (
-    <HStack spacing={4} mb={4} width="100%">
+    <VStack 
+      spacing={2} 
+      width="100%"
+      align={{ base: "stretch", md: "flex-start" }}
+    >
       <Text color="gray.300" fontSize="sm">Filter by risk:</Text>
-      <ButtonGroup size="sm" isAttached variant="outline">
+      <ButtonGroup 
+        size="sm" 
+        isAttached 
+        variant="outline"
+        width={{ base: "100%", sm: "auto" }}
+        display="flex"
+      >
         {riskLevels.map(({ value, label, color }) => (
           <Button
             key={value}
@@ -29,12 +39,13 @@ const RiskLevelFilter = ({ selectedRiskLevel, onRiskLevelChange }) => {
             }}
             color={selectedRiskLevel === value ? 'white' : color}
             borderColor="gray.600"
+            flex={1}
           >
             {label}
           </Button>
         ))}
       </ButtonGroup>
-    </HStack>
+    </VStack>
   );
 };
 

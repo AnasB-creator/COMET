@@ -40,6 +40,7 @@ export function GenerateReportButton({ crewMemberId, className }) {
       onClick={handleGenerateReport}
       disabled={isLoading}
       className={className}
+      width={{ base: "100%", sm: "auto" }}
     >
       <IoAddCircleOutline className="mr-2" />
       Generate Report
