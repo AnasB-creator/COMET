@@ -6,9 +6,10 @@ import CrewStatus from './crew/CrewStatus';
 import HealthMetricsQuadrant from './health/HealthMetricsQuadrant';
 import HealthProblems from './health/HealthProblems';
 import HealthReportsQuadrant from './reports/HealthReportsQuadrant';
+import { useCrewMemberMutation } from './hooks/useCrewMemberMutation';
 
 function CrewMemberPage() {
-  // Get all crew members data with proper v5 syntax
+  // Get all crew members data
   const { 
     data: crewMembers, 
     isLoading, 
@@ -20,6 +21,9 @@ function CrewMemberPage() {
 
   // State for current crew member index
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Use our existing mutation hook
+  const createCrewMutation = useCrewMemberMutation();
 
   // Filter crew members by fleet F001 and memoize the result
   const fleetMembers = React.useMemo(() => {
@@ -42,6 +46,18 @@ function CrewMemberPage() {
 
   // Get current crew member
   const currentCrewMember = fleetMembers[currentIndex];
+
+  const handleAddCrewMember = async (formData) => {
+    try {
+      await createCrewMutation.mutateAsync({
+        ...formData,
+        fleet: 'F001', // Ensure fleet ID is included
+      });
+    } catch (error) {
+      console.error('Error creating crew member:', error);
+      // You might want to handle this error in the UI
+    }
+  };
 
   if (isLoading) {
     return (
@@ -73,6 +89,9 @@ function CrewMemberPage() {
         crewMember={currentCrewMember}
         onPrevious={handlePrevious}
         onNext={handleNext}
+        totalCrewCount={fleetMembers.length}
+        onAddCrewMember={handleAddCrewMember}
+        isSubmitting={createCrewMutation.isLoading}
       />
       <HealthMetricsQuadrant crewMember={currentCrewMember} />
       <HealthProblems crewMember={currentCrewMember} />    
