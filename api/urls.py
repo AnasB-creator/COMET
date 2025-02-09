@@ -1,5 +1,6 @@
 from django.urls import path
+from .views import get_crew_members_data
 
 urlpatterns = [
-    # Add your API endpoints here
+    path('crew-members/', get_crew_members_data, name='crew-members-data'),
 ]

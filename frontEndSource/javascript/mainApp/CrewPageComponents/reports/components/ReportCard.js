@@ -31,6 +31,17 @@ const ReportCard = ({ report }) => {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const riskColor = getRiskColor(report.riskLevel);
   
+  // Get preview content based on structure
+  const getPreviewContent = () => {
+    if (typeof report.content === 'string') {
+      return report.content;
+    }
+    if (report.content?.sections?.[0]) {
+      return report.content.sections[0].content;
+    }
+    return 'No content available';
+  };
+  
   return (
     <>
       <Box
@@ -66,6 +77,9 @@ const ReportCard = ({ report }) => {
               </Text>
               <Text color="gray.300" fontSize="sm">
                 {report.subtitle}
+              </Text>
+              <Text color="gray.400" fontSize="sm" noOfLines={2}>
+                {getPreviewContent()}
               </Text>
             </VStack>
             <IconButton

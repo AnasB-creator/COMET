@@ -1,37 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Box, Text, Center, Spinner } from '@chakra-ui/react';
+import { useQuery } from '@tanstack/react-query';
 import QuadrantLayout from './layout/QuadrantLayout';
 import CrewStatus from './crew/CrewStatus';
 import HealthMetricsQuadrant from './health/HealthMetricsQuadrant';
 import HealthProblems from './health/HealthProblems';
 import HealthReportsQuadrant from './reports/HealthReportsQuadrant';
-import { getMockCrewMemberById } from './services/mockData';
+import { getCrewMembersData } from '../customApiCalls/apiCalls';
 
 function CrewMemberPage({ crewMemberId }) {
-  const [crewMember, setCrewMember] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: crewMembers, isLoading, error } = useQuery({
+    queryKey: ['crewMembers'],
+    queryFn: getCrewMembersData,
+  });
+  console.log(crewMembers);
 
-  useEffect(() => {
-    const fetchCrewMember = async () => {
-      try {
-        const data = await getMockCrewMemberById(crewMemberId);
-        if (data) {
-          setCrewMember(data);
-        } else {
-          setError('Crew member not found');
-        }
-      } catch (err) {
-        setError('Failed to fetch crew member data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCrewMember();
-  }, [crewMemberId]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <Center h="100vh">
         <Spinner size="xl" />
@@ -39,10 +23,20 @@ function CrewMemberPage({ crewMemberId }) {
     );
   }
 
-  if (error || !crewMember) {
+  if (error) {
     return (
       <Center h="100vh">
-        <Text color="red.500">{error || 'Crew member not found'}</Text>
+        <Text color="red.500">Failed to fetch crew member data</Text>
+      </Center>
+    );
+  }
+
+  const crewMember = crewMembers?.find(member => member.id === crewMemberId);
+
+  if (!crewMember) {
+    return (
+      <Center h="100vh">
+        <Text color="red.500">Crew member not found</Text>
       </Center>
     );
   }
