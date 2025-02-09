@@ -5,6 +5,7 @@ import {
   Button,
   Fieldset,
   Input,
+  Text,
 } from '@chakra-ui/react';
 import {
   DialogRoot,
@@ -26,24 +27,45 @@ import {
 } from '../../../components/ui/select';
 import { createListCollection } from '@chakra-ui/react';
 
-const CREW_STATUSES = [
-  { label: 'Active', value: 'active' },
-  { label: 'Inactive', value: 'inactive' },
-  { label: 'Critical', value: 'critical' }
-];
+const SEX_OPTIONS = createListCollection({
+  items: [
+    { value: 'male', label: 'Male' },
+    { value: 'female', label: 'Female' }
+  ]
+});
+
+const CREW_ROLES = createListCollection({
+  items: [
+    { value: 'commander', label: 'Commander' },
+    { value: 'pilot', label: 'Pilot' },
+    { value: 'engineer', label: 'Engineer' },
+    { value: 'medical', label: 'Medical Officer' },
+    { value: 'science', label: 'Science Officer' }
+  ]
+});
+
+const CREW_STATUSES = createListCollection({
+  items: [
+    { value: 'active', label: 'Active' },
+    { value: 'inactive', label: 'Inactive' },
+    { value: 'critical', label: 'Critical' }
+  ]
+});
 
 function AddCrewMemberDialog({ 
   isOpen, 
   onClose, 
   onSubmit,
-  opacity = 0.7,
-  blurStrength = 8,
+  fleetName = "Fleet F001",
+  captainName = "Captain O'Neil",
 }) {
   const [formData, setFormData] = React.useState({
     firstName: '',
     lastName: '',
     role: '',
-    status: 'active'
+    status: ['active'],
+    dateOfBirth: '',
+    sex: '',
   });
 
   const [errors, setErrors] = React.useState({});
@@ -62,10 +84,10 @@ function AddCrewMemberDialog({
     }
   };
 
-  const handleStatusChange = (value) => {
+  const handleStatusChange = (details) => {
     setFormData(prev => ({
       ...prev,
-      status: value
+      status: Array.isArray(details) ? details : [details]
     }));
   };
 
@@ -91,28 +113,77 @@ function AddCrewMemberDialog({
 
   const hasErrors = Object.keys(errors).length > 0;
 
-  const statusOptions = createListCollection({
-    items: [
-      { value: 'active', label: 'Active' },
-      { value: 'inactive', label: 'Inactive' },
-      { value: 'critical', label: 'Critical' }
-    ],
-  });
+  const selectStyles = {
+    trigger: {
+      height: "42px",
+      borderRadius: "lg",
+      bg: "white",
+      border: "1px solid",
+      borderColor: "purple.200",
+      color: "purple.900",
+      _hover: { borderColor: "purple.300" },
+    },
+    content: {
+      bg: "white",
+      borderRadius: "md",
+      border: "1px solid rgba(255, 255, 255, 0.1)",
+      boxShadow: "0 4px 20px rgba(123, 67, 251, 0.15)",
+      p: 1,
+      maxH: "300px",
+      overflow: "auto",
+      zIndex: "popover",
+    },
+    item: {
+      p: "8px 12px",
+      borderRadius: "md",
+      cursor: "pointer",
+      color: "purple.800",
+      transition: "all 0.2s",
+      _hover: { bg: "purple.50" },
+      _focus: { bg: "purple.100" },
+      _selected: { bg: "purple.100", fontWeight: "semibold" },
+    }
+  };
 
   return (
     <DialogRoot open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        bg={`rgba(26, 32, 44, ${opacity})`}
-        backdropFilter={`blur(${blurStrength}px)`}
+        bg="white"
         border="1px solid"
-        borderColor="whiteAlpha.200"
-        borderRadius="xl"
+        borderColor="purple.100"
+        borderRadius="2xl"
+        maxW="480px"
+        position="relative"
+        zIndex="modal"
+        p={0}
+        boxShadow="0 4px 20px rgba(123, 67, 251, 0.1)"
       >
-        <DialogHeader>
-          <DialogTitle>Add New Crew Member</DialogTitle>
+        <DialogHeader
+          borderBottom="1px solid"
+          borderColor="purple.100"
+          p={6}
+          pb={5}
+          bg="purple.50"
+          borderTopRadius="2xl"
+        >
+          <DialogTitle color="purple.900" fontSize="2xl" fontWeight="semibold" mb={4}>
+            Add New Crew Member
+          </DialogTitle>
+          <Box bg="blue.900" p={3} borderRadius="lg" color="white">
+            <Text fontSize="sm" fontWeight="medium" mb={1} opacity={0.9}>
+              Adding crew member to:
+            </Text>
+            <Text fontSize="md" fontWeight="semibold">
+              {fleetName} • {captainName}
+            </Text>
+          </Box>
+          <Text color="purple.700" fontSize="sm" mt={4} lineHeight="1.5">
+            Please fill in the details below to add a new crew member to your fleet. 
+            All fields marked with an asterisk (*) are required.
+          </Text>
         </DialogHeader>
-        
-        <DialogBody>
+
+        <DialogBody p={6} bg="white">
           <Box as="form" id="add-crew-form" onSubmit={handleSubmit}>
             <Fieldset.Root invalid={hasErrors}>
               <Fieldset.Legend>Crew Member Details</Fieldset.Legend>
@@ -153,36 +224,75 @@ function AddCrewMemberDialog({
                   </Field>
 
                   <Field 
-                    label="Role"
-                    invalid={!!errors.role}
+                    label="Sex *"
+                    invalid={!!errors.sex}
+                    helperText={errors.sex}
                   >
-                    <Input
-                      name="role"
+                    <SelectRoot 
+                      value={formData.sex}
+                      onValueChange={(value) => handleChange({ target: { name: 'sex', value }})}
+                      collection={SEX_OPTIONS}
+                    >
+                      <SelectTrigger {...selectStyles.trigger}>
+                        <SelectValueText />
+                      </SelectTrigger>
+                      <SelectContent {...selectStyles.content}>
+                        {SEX_OPTIONS.items.map((item) => (
+                          <SelectItem 
+                            key={item.value} 
+                            item={item}
+                            sx={selectStyles.item}
+                          >
+                            {item.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </SelectRoot>
+                  </Field>
+
+                  <Field 
+                    label="Role *"
+                    invalid={!!errors.role}
+                    helperText={errors.role}
+                  >
+                    <SelectRoot 
                       value={formData.role}
-                      onChange={handleChange}
-                      bg="whiteAlpha.50"
-                      border="1px solid"
-                      borderColor="whiteAlpha.200"
-                      _hover={{ borderColor: "whiteAlpha.300" }}
-                      _focus={{ borderColor: "blue.300", boxShadow: "none" }}
-                      placeholder="Enter role"
-                    />
+                      onValueChange={handleChange}
+                      collection={CREW_ROLES}
+                    >
+                      <SelectTrigger {...selectStyles.trigger}>
+                        <SelectValueText />
+                      </SelectTrigger>
+                      <SelectContent {...selectStyles.content}>
+                        {CREW_ROLES.items.map((item) => (
+                          <SelectItem 
+                            key={item.value} 
+                            item={item}
+                            sx={selectStyles.item}
+                          >
+                            {item.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </SelectRoot>
                   </Field>
 
                   <Field label="Status">
                     <SelectRoot 
                       value={formData.status}
+                      defaultValue={['active']}
                       onValueChange={handleStatusChange}
-                      collection={statusOptions}
+                      collection={CREW_STATUSES}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger {...selectStyles.trigger}>
                         <SelectValueText />
                       </SelectTrigger>
-                      <SelectContent>
-                        {statusOptions.items.map((item) => (
+                      <SelectContent {...selectStyles.content}>
+                        {CREW_STATUSES.items.map((item) => (
                           <SelectItem 
                             key={item.value} 
                             item={item}
+                            sx={selectStyles.item}
                           >
                             {item.label}
                           </SelectItem>
@@ -201,12 +311,21 @@ function AddCrewMemberDialog({
           </Box>
         </DialogBody>
 
-        <DialogFooter>
+        <DialogFooter 
+          borderTop="1px solid"
+          borderColor="purple.100"
+          p={6}
+          gap={3}
+          bg="purple.50"
+        >
           <DialogActionTrigger asChild>
             <Button
               variant="ghost"
-              _hover={{ bg: 'whiteAlpha.100' }}
-              color="whiteAlpha.900"
+              color="purple.600"
+              height="42px"
+              fontSize="md"
+              fontWeight="medium"
+              _hover={{ bg: 'purple.100' }}
             >
               Cancel
             </Button>
@@ -214,14 +333,17 @@ function AddCrewMemberDialog({
           <Button
             type="submit"
             form="add-crew-form"
-            bg="blue.500"
-            _hover={{ bg: 'blue.600' }}
+            bg="blue.600"
+            height="42px"
+            fontSize="md"
+            fontWeight="medium"
+            _hover={{ bg: 'blue.700' }}
             color="white"
+            boxShadow="0 2px 8px rgba(66, 153, 225, 0.3)"
           >
             Add Crew Member
           </Button>
         </DialogFooter>
-        <DialogCloseTrigger />
       </DialogContent>
     </DialogRoot>
   );
