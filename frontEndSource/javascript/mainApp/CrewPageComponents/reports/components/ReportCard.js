@@ -6,19 +6,17 @@ import {
   Text,
   Badge,
   IconButton,
-  Collapsible,
 } from '@chakra-ui/react';
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-
-
+import { FiMaximize2 } from "react-icons/fi";
+import ReportDialog from './ReportDialog';
 
 const getRiskColor = (riskLevel) => {
   const colors = {
-    low: 'green',
-    medium: 'orange',
-    high: 'red'
+    low: 'var(--chakra-colors-green-500)',
+    medium: 'var(--chakra-colors-orange-500)',
+    high: 'var(--chakra-colors-red-500)'
   };
-  return colors[riskLevel] || 'gray';
+  return colors[riskLevel] || 'var(--chakra-colors-gray-500)';
 };
 
 const formatDate = (dateString) => {
@@ -30,24 +28,24 @@ const formatDate = (dateString) => {
 };
 
 const ReportCard = ({ report }) => {
-  const [isExpanded, setIsExpanded] = React.useState(false);
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const riskColor = getRiskColor(report.riskLevel);
   
   return (
-    <Box
-      borderRadius="md"
-      bg="rgba(26, 32, 44, 0.3)"
-      borderWidth="1px"
-      borderColor={`${riskColor}.600`}
-      p={3}
-      transition="all 0.2s"
-      _hover={{
-        borderColor: `${riskColor}.400`,
-        bg: "rgba(26, 32, 44, 0.4)"
-      }}
-    >
-      <VStack align="stretch" spacing={2}>
-        <Collapsible.Root open={isExpanded} onOpenChange={({open}) => setIsExpanded(open)}>
+    <>
+      <Box
+        borderRadius="md"
+        bg="rgba(26, 32, 44, 0.3)"
+        borderWidth="1px"
+        borderColor={riskColor}
+        p={3}
+        transition="all 0.2s"
+        _hover={{
+          borderColor: riskColor,
+          bg: "rgba(26, 32, 44, 0.4)"
+        }}
+      >
+        <VStack align="stretch" spacing={2}>
           <HStack justify="space-between">
             <VStack align="start" spacing={1}>
               <HStack>
@@ -55,8 +53,8 @@ const ReportCard = ({ report }) => {
                   {report.title}
                 </Text>
                 <Badge
-                  colorScheme={riskColor}
-                  variant="subtle"
+                  bg={riskColor}
+                  color="white"
                   px={2}
                   borderRadius="full"
                 >
@@ -66,38 +64,31 @@ const ReportCard = ({ report }) => {
               <Text color="gray.400" fontSize="sm">
                 {formatDate(report.date)}
               </Text>
-            </VStack>
-            <Collapsible.Trigger asChild>
-              <IconButton
-                size="sm"
-                variant="ghost"
-                icon={isExpanded ? <FaChevronUp /> : <FaChevronDown />}
-                aria-label={isExpanded ? "Collapse" : "Expand"}
-                color="gray.400"
-                _hover={{ color: "white" }}
-
-              />
-            </Collapsible.Trigger>
-          </HStack>
-
-          <Text color="gray.300" fontSize="sm">
-            {report.subtitle}
-          </Text>
-
-          <Collapsible.Content>
-            <Box
-              pt={2}
-              borderTopWidth="1px"
-              borderColor="gray.700"
-            >
               <Text color="gray.300" fontSize="sm">
-                {report.content}
+                {report.subtitle}
               </Text>
-            </Box>
-          </Collapsible.Content>
-        </Collapsible.Root>
-      </VStack>
-    </Box>
+            </VStack>
+            <IconButton
+              size="sm"
+              variant="ghost"
+            
+              aria-label="View full report"
+              color="gray.400"
+              _hover={{ color: "white" }}
+              onClick={() => setIsDialogOpen(true)}
+            >
+                <FiMaximize2 />
+            </IconButton>
+          </HStack>
+        </VStack>
+      </Box>
+
+      <ReportDialog 
+        isOpen={isDialogOpen} 
+        onClose={() => setIsDialogOpen(false)} 
+        report={report} 
+      />
+    </>
   );
 };
 

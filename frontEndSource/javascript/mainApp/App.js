@@ -17,11 +17,10 @@ import CrewMemberPage from './CrewPageComponents/CrewMemberPage';
 
 const App = () => {
   return (
-    <Provider >
-      <CrewMemberPage />
+    <Provider>
+      <CrewMemberPage crewMemberId="CM002" />
     </Provider>
   );
-
 };
 
 export default App;
