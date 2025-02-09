@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { IconButton, Box, Text, HStack, Button, Spinner, Center } from '@chakra-ui/react';
-import { IoChevronDown, IoChevronBackOutline, IoChevronForwardOutline } from 'react-icons/io5';
+import { IconButton, Box, Text, HStack, Button, Spinner, Center, VStack } from '@chakra-ui/react';
+import { IoChevronDown, IoChevronBackOutline, IoChevronForwardOutline, IoAddCircleOutline } from 'react-icons/io5';
 import {
   DrawerRoot,
   DrawerBackdrop,
@@ -13,10 +13,14 @@ import {
 } from '../../components/ui/drawer';
 import FleetAvatar from './FleetAvatar';
 import { useFleets } from './hooks/useFleetQueries';
+import AddFleetDialog from './AddFleetDialog';
+import { useFleetMutation } from './hooks/useFleetMutation';
 
 const FleetDrawer = ({ onFleetChange }) => {
   const { data: fleets, isLoading, error } = useFleets();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const createFleetMutation = useFleetMutation();
 
   useEffect(() => {
     if (fleets && fleets[currentIndex]) {
@@ -37,6 +41,14 @@ const FleetDrawer = ({ onFleetChange }) => {
   };
 
   const currentFleet = fleets?.[currentIndex];
+
+  const handleAddFleet = async (fleetData) => {
+    try {
+      await createFleetMutation.mutateAsync(fleetData);
+    } catch (error) {
+      console.error('Error creating fleet:', error);
+    }
+  };
 
   return (
     <DrawerRoot placement="top">
@@ -85,39 +97,50 @@ const FleetDrawer = ({ onFleetChange }) => {
               Error loading fleets
             </Center>
           ) : (
-            <HStack spacing={4} justify="center" align="center" h="100%">
-              <IconButton
-                variant="ghost"
-                color="white"
-                size="lg"
-                onClick={handlePrevious}
-                isDisabled={!fleets?.length}
-                _hover={{ bg: 'whiteAlpha.200' }}
-                bg="rgba(26, 32, 44, 0.8)"
-                boxShadow="0 0 10px rgba(0,0,0,0.3)"
-                border="1px solid"
-                borderColor="whiteAlpha.200"
+            <VStack spacing={4} h="100%">
+              <Button
+                leftIcon={<IoAddCircleOutline />}
+                onClick={() => setIsAddDialogOpen(true)}
+                variant="outline"
+                colorScheme="purple"
+                w="full"
               >
-                <IoChevronBackOutline size={24} />
-              </IconButton>
-              
-              {currentFleet && <FleetAvatar fleet={currentFleet} />}
-              
-              <IconButton
-                variant="ghost"
-                color="white"
-                size="lg"
-                onClick={handleNext}
-                isDisabled={!fleets?.length}
-                _hover={{ bg: 'whiteAlpha.200' }}
-                bg="rgba(26, 32, 44, 0.8)"
-                boxShadow="0 0 10px rgba(0,0,0,0.3)"
-                border="1px solid"
-                borderColor="whiteAlpha.200"
-              >
-                <IoChevronForwardOutline size={24} />
-              </IconButton>
-            </HStack>
+                Add New Fleet
+              </Button>
+              <HStack spacing={4} justify="center" align="center" h="100%">
+                <IconButton
+                  variant="ghost"
+                  color="white"
+                  size="lg"
+                  onClick={handlePrevious}
+                  isDisabled={!fleets?.length}
+                  _hover={{ bg: 'whiteAlpha.200' }}
+                  bg="rgba(26, 32, 44, 0.8)"
+                  boxShadow="0 0 10px rgba(0,0,0,0.3)"
+                  border="1px solid"
+                  borderColor="whiteAlpha.200"
+                >
+                  <IoChevronBackOutline size={24} />
+                </IconButton>
+                
+                {currentFleet && <FleetAvatar fleet={currentFleet} />}
+                
+                <IconButton
+                  variant="ghost"
+                  color="white"
+                  size="lg"
+                  onClick={handleNext}
+                  isDisabled={!fleets?.length}
+                  _hover={{ bg: 'whiteAlpha.200' }}
+                  bg="rgba(26, 32, 44, 0.8)"
+                  boxShadow="0 0 10px rgba(0,0,0,0.3)"
+                  border="1px solid"
+                  borderColor="whiteAlpha.200"
+                >
+                  <IoChevronForwardOutline size={24} />
+                </IconButton>
+              </HStack>
+            </VStack>
           )}
         </DrawerBody>
         <DrawerCloseTrigger 
@@ -127,6 +150,12 @@ const FleetDrawer = ({ onFleetChange }) => {
           color="white"
         />
       </DrawerContent>
+
+      <AddFleetDialog
+        isOpen={isAddDialogOpen}
+        onClose={() => setIsAddDialogOpen(false)}
+        onSubmit={handleAddFleet}
+      />
     </DrawerRoot>
   );
 };
