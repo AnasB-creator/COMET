@@ -9,6 +9,7 @@ import {
   Button,
   HStack,
   Icon,
+  Heading,
 } from '@chakra-ui/react';
 import { 
   SelectRoot, 
@@ -60,14 +61,6 @@ function HealthProblems({ crewMember, opacity = 0.7, blurStrength = 8 }) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const createHealthProblemMutation = useHealthProblemMutation();
   
-  const glassEffect = {
-    background: `rgba(26, 32, 44, 0.2)`,
-    backdropFilter: 'blur(8px)',
-    borderRadius: '12px',
-    transition: 'all 0.3s ease',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-  };
-
   const filterOptions = createListCollection({
     items: [
       { value: 'all', label: 'All Issues' },
@@ -83,7 +76,6 @@ function HealthProblems({ crewMember, opacity = 0.7, blurStrength = 8 }) {
   });
 
   const handleFilterChange = (newValue) => {
-    console.log('Filter changed to:', newValue);
     setFilter(newValue);
   };
 
@@ -91,92 +83,100 @@ function HealthProblems({ crewMember, opacity = 0.7, blurStrength = 8 }) {
     try {
       await createHealthProblemMutation.mutateAsync({
         ...healthProblemData,
-        crew_member: crewMember.id.replace('CM', ''), // Remove 'CM' prefix
+        crew_member: crewMember.id,
       });
-      // Success notification could be added here
     } catch (error) {
       console.error('Error creating health problem:', error);
-      // Error notification could be added here
     }
   };
 
   return (
     <>
       <Box
-        {...glassEffect}
+        height="100%"
+        bg="rgba(26, 32, 44, 0.2)"
+        backdropFilter="blur(8px)"
+        borderRadius="lg"
         p={4}
-        h="100%"
-        display="flex"
-        flexDirection="column"
+        position="relative"
+        overflow="hidden"
       >
-        <Flex justify="space-between" align="center" mb={4}>
-          <Text fontSize="xl" fontWeight="bold" color="white">
-            Health Problems
-          </Text>
-          <Button
-            leftIcon={<Icon as={IoAddCircleOutline} />}
-            variant="ghost"
-            color="white"
-            _hover={{ bg: 'whiteAlpha.200' }}
-            onClick={() => setIsAddDialogOpen(true)}
+        <VStack spacing={4} height="100%">
+          {/* Header Section */}
+          <Flex w="100%" justify="space-between" align="center">
+            <Heading size="lg" color="gray.100">
+              Health Problems
+            </Heading>
+            <Button
+              leftIcon={<Icon as={IoAddCircleOutline} />}
+              variant="ghost"
+              color="white"
+              _hover={{ bg: 'whiteAlpha.200' }}
+              onClick={() => setIsAddDialogOpen(true)}
+            >
+              Add Problem
+            </Button>
+          </Flex>
+
+          {/* Filter Section */}
+          <Box w="100%">
+            <SelectRoot 
+              value={filter} 
+              onValueChange={handleFilterChange}
+              collection={filterOptions}
+            >
+              <SelectTrigger>
+                <SelectValueText />
+              </SelectTrigger>
+              <SelectContent>
+                {filterOptions.items.map((item) => (
+                  <SelectItem 
+                    key={item.value} 
+                    item={item}
+                  >
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </SelectRoot>
+          </Box>
+
+          {/* Scrollable Content Section */}
+          <Box
+            overflowY="auto"
+            height="calc(100% - 120px)" // Adjust for header and filter height
+            width="100%"
+            css={{
+              '&::-webkit-scrollbar': {
+                width: '4px',
+              },
+              '&::-webkit-scrollbar-track': {
+                background: 'rgba(0, 0, 0, 0.1)',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: 'rgba(255, 255, 255, 0.3)',
+                borderRadius: '4px',
+              },
+            }}
           >
-            Add Problem
-          </Button>
-        </Flex>
-
-        <SelectRoot 
-          value={filter} 
-          onValueChange={handleFilterChange}
-          collection={filterOptions}
-        >
-          <SelectTrigger>
-            <SelectValueText />
-          </SelectTrigger>
-          <SelectContent>
-            {filterOptions.items.map((item) => (
-              <SelectItem 
-                key={item.value} 
-                item={item}
-              >
-                {item.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </SelectRoot>
-
-        <VStack
-          spacing={3}
-          align="stretch"
-          overflowY="auto"
-          flex="1"
-          css={{
-            '&::-webkit-scrollbar': {
-              width: '4px',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: 'rgba(0, 0, 0, 0.1)',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: 'rgba(255, 255, 255, 0.3)',
-              borderRadius: '2px',
-            },
-          }}
-        >
-          {filteredProblems.length === 0 ? (
-            <Text color="gray.400" textAlign="center">
-              No health problems found
-            </Text>
-          ) : (
-            filteredProblems.map((problem) => (
-              <ProblemItem
-                key={problem.id}
-                date={problem.date}
-                status={problem.status}
-                description={problem.description}
-                severity={problem.severity}
-              />
-            ))
-          )}
+            <VStack spacing={3} align="stretch">
+              {filteredProblems.length === 0 ? (
+                <Text color="gray.400" textAlign="center">
+                  No health problems found
+                </Text>
+              ) : (
+                filteredProblems.map((problem) => (
+                  <ProblemItem
+                    key={problem.id}
+                    date={problem.date}
+                    status={problem.status}
+                    description={problem.description}
+                    severity={problem.severity}
+                  />
+                ))
+              )}
+            </VStack>
+          </Box>
         </VStack>
       </Box>
 
