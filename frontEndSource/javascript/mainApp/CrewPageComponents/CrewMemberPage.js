@@ -9,8 +9,12 @@ import {HealthReportsQuadrant} from './reports/HealthReportsQuadrant';
 import { useCrewMemberMutation } from './hooks/useCrewMemberMutation';
 import { useFleets } from '../FleetComponents/hooks/useFleetQueries';
 import { getCrewMembersData } from '../customApiCalls/apiCalls';
+import AddCrewMemberDialog from './crew/AddCrewMemberDialog';
 
 function CrewMemberPage({ selectedFleetId }) {
+  // Move useState hook to the top level
+  const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
+
   const { data: crewMembers, isLoading, error } = useQuery({
     queryKey: ['crewMembers', selectedFleetId],
     queryFn: () => getCrewMembersData(selectedFleetId),
@@ -79,12 +83,16 @@ function CrewMemberPage({ selectedFleetId }) {
               <Text color="white" fontSize="xl">
                 No crew members found in Fleet {selectedFleetId}
               </Text>
+              <AddCrewMemberDialog
+                isOpen={isAddDialogOpen}
+                onClose={() => setIsAddDialogOpen(false)}
+                onSubmit={handleAddCrewMember}
+                opacity={0.7}
+                blurStrength={8}
+              />
               <Button
                 colorScheme="blue"
-                onClick={() => {
-                  // TODO: Open create crew member dialog
-                  console.log("Create crew member for fleet:", selectedFleetId);
-                }}
+                onClick={() => setIsAddDialogOpen(true)}
               >
                 Add Crew Member
               </Button>
