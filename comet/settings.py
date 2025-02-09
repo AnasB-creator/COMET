@@ -25,6 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Assuming .env path is one level above settings.py
 environ.Env.read_env(BASE_DIR / '.env')
 
+CLAUDE_API_KEY = env.str('CLAUDE_API_KEY')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
